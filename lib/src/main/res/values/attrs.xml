@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="defaultColor" format="color"></attr>
+    <attr name="cirRadius" format="dimension"></attr>
+    <attr name="cycleTime" format="integer"></attr>
+
+    <declare-styleable name="LikeView">
+        <attr name="defaultColor" />
+        <attr name="cirRadius" />
+        <attr name="cycleTime" />
+    </declare-styleable>
+
+
+
+</resources>
