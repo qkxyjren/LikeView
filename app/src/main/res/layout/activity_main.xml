@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context="com.jaren.likeview.MainActivity">
 
     <com.jaren.lib.view.LikeView
         android:id="@+id/lv"
-        app:cirRadius="20dp"
-        app:cycleTime="3000"
-        app:defaultColor="#ff657487"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:cirRadius="10dp"
+        app:cycleTime="2000"
+        app:defaultColor="#ff657487" />
 
-</RelativeLayout>
+    <com.jaren.lib.view.LikeView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/lv"
+        android:layout_alignParentRight="true"
+        app:cirRadius="20dp"
+        app:cycleTime="1000"
+        app:defaultColor="#ff657487" />
+
+    <com.jaren.lib.view.LikeView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:cirRadius="40dp"
+        app:cycleTime="1600"
+        app:defaultColor="#ffcc99cc" />
+
+</LinearLayout>

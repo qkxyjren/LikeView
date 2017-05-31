@@ -112,19 +112,19 @@ public class LikeView extends View {
         super.onDraw(canvas);
         canvas.translate(mCenterX, mCenterY);//使坐标原点在canvas中心位置
         switch (mCurrentState) {
-            case HEART_VIEW:
+            case HEART_VIEW://1.绘制心形并伴随缩小和颜色渐变
                 drawHeart(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case CIRCLE_VIEW:
+            case CIRCLE_VIEW://2.绘制圆并伴随放大和颜色渐变
                 drawCircle(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case RING_VIEW:
+            case RING_VIEW://3.绘制圆环并伴随放大和颜色渐变
                 drawRing(canvas, mCurrentRadius, mCurrentColor, mCurrentPercent);
                 break;
-            case RING_DOT__HEART_VIEW:
+            case RING_DOT__HEART_VIEW://4.圆环减消失、心形放大、周围环绕十四圆点
                 drawDotWithRing(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case DOT__HEART_VIEW:
+            case DOT__HEART_VIEW://5.环绕的十四圆点向外移动并缩小、透明度渐变、渐隐
                 drawDot(canvas, mCurrentRadius, mCurrentColor);
                 break;
         }
@@ -287,7 +287,7 @@ public class LikeView extends View {
         if (animatorTime != null && animatorTime.isRunning())
             return;
         resetState();
-        animatorTime = ValueAnimator.ofInt(0, 1200);//100?
+        animatorTime = ValueAnimator.ofInt(0, 1200);
         animatorTime.setDuration(mCycleTime);
         animatorTime.setInterpolator(new LinearInterpolator());//需要随时间匀速变化
         animatorTime.start();
@@ -303,8 +303,8 @@ public class LikeView extends View {
                         animatorArgb.setInterpolator(new LinearInterpolator());
                         animatorArgb.start();
                     }
-                } else if (animatedValue <= 200) {
-                    float percent = calcPercent(0f, 200f, animatedValue);
+                } else if (animatedValue <= 100) {
+                    float percent = calcPercent(0f, 100f, animatedValue);
                     mCurrentRadius = (int) (mRadius - mRadius * percent);
                     if (animatorArgb != null && animatorArgb.isRunning())
                         mCurrentColor = (int) animatorArgb.getAnimatedValue();
@@ -312,14 +312,14 @@ public class LikeView extends View {
                     invalidate();
 
                 } else if (animatedValue <= 280) {
-                    float percent = calcPercent(200f, 340f, animatedValue);//此阶段未达到最大半径
+                    float percent = calcPercent(100f, 340f, animatedValue);//此阶段未达到最大半径
                     mCurrentRadius = (int) (2 * mRadius * percent);
                     if (animatorArgb != null && animatorArgb.isRunning())
                         mCurrentColor = (int) animatorArgb.getAnimatedValue();
                     mCurrentState = CIRCLE_VIEW;
                     invalidate();
                 } else if (animatedValue <= 340) {
-                    float percent = calcPercent(200f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
+                    float percent = calcPercent(100f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
                     mCurrentPercent = 1f - percent + 0.2f > 1f ? 1f : 1f - percent + 0.2f;//用于计算圆环宽度，最小0.2，与动画进度负相关
                     mCurrentRadius = (int) (2 * mRadius * percent);
                     if (animatorArgb != null && animatorArgb.isRunning())
@@ -337,7 +337,6 @@ public class LikeView extends View {
                     mCurrentPercent = percent;
                     mCurrentState = DOT__HEART_VIEW;
                     if (animatedValue == 1200) {
-//                        Log.i("LikeViewtag", "end");
                         animatorTime.cancel();
                         animatorTime.removeAllListeners();
                         state = true;
@@ -364,6 +363,7 @@ public class LikeView extends View {
         rDotL = 0;
         offS = 0;
         offL = 0;
+
     }
 
     private float calcPercent(float start, float end, float current) {
@@ -406,8 +406,8 @@ public class LikeView extends View {
                     } else {
                         startViewMotion();
                     }
-
-                    mListener.onClick(this);
+                    if (mListener != null)
+                        mListener.onClick(this);
                 }
                 break;
         }
@@ -431,13 +431,5 @@ public class LikeView extends View {
         mListener = l;
     }
 
-    /**
-     * Indicates whether this LikeView is  selected	 or not.
-     *
-     * @return true if the LikeView is selected now, false is deselected
-     */
-    public boolean getState() {
-        return this.state;
 
-    }
 }
