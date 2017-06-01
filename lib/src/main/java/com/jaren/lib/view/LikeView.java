@@ -41,13 +41,33 @@ public class LikeView extends View {
      * 选择/取消选择
      */
     private boolean state;
-
+    /**
+     * 心形默认颜色
+     */
     private static final int CLICKED_CLOLOR = 0xffe53a42;
+    /**
+     * 环绕圆点的颜色
+     */
     private static final int[] dotColors = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed, 0xffb1eb99, 0xff67c9ad, 0xffde6bac};
+    /**
+     * 1.绘制心形并伴随缩小和颜色渐变
+     */
     private static final int HEART_VIEW = 0;
+    /**
+     * 2.绘制圆并伴随放大和颜色渐变
+     */
     private static final int CIRCLE_VIEW = 1;
+    /**
+     * 3.绘制圆环并伴随放大和颜色渐变
+     */
     private static final int RING_VIEW = 2;
+    /**
+     * 4.圆环减消失、心形放大、周围环绕十四圆点
+     */
     private static final int RING_DOT__HEART_VIEW = 3;
+    /**
+     * 5.环绕的十四圆点向外移动并缩小、透明度渐变、渐隐
+     */
     private static final int DOT__HEART_VIEW = 4;
 
     private float mCenterX;
@@ -112,19 +132,19 @@ public class LikeView extends View {
         super.onDraw(canvas);
         canvas.translate(mCenterX, mCenterY);//使坐标原点在canvas中心位置
         switch (mCurrentState) {
-            case HEART_VIEW://1.绘制心形并伴随缩小和颜色渐变
+            case HEART_VIEW:
                 drawHeart(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case CIRCLE_VIEW://2.绘制圆并伴随放大和颜色渐变
+            case CIRCLE_VIEW:
                 drawCircle(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case RING_VIEW://3.绘制圆环并伴随放大和颜色渐变
+            case RING_VIEW:
                 drawRing(canvas, mCurrentRadius, mCurrentColor, mCurrentPercent);
                 break;
-            case RING_DOT__HEART_VIEW://4.圆环减消失、心形放大、周围环绕十四圆点
+            case RING_DOT__HEART_VIEW:
                 drawDotWithRing(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case DOT__HEART_VIEW://5.环绕的十四圆点向外移动并缩小、透明度渐变、渐隐
+            case DOT__HEART_VIEW:
                 drawDot(canvas, mCurrentRadius, mCurrentColor);
                 break;
         }
@@ -339,7 +359,6 @@ public class LikeView extends View {
                     if (animatedValue == 1200) {
                         animatorTime.cancel();
                         animatorTime.removeAllListeners();
-                        state = true;
                     }
                     invalidate();
 
@@ -363,6 +382,8 @@ public class LikeView extends View {
         rDotL = 0;
         offS = 0;
         offL = 0;
+        state = true;
+
 
     }
 
@@ -419,6 +440,8 @@ public class LikeView extends View {
      * 取消选择
      */
     private void deselectLike() {
+        if (animatorTime != null && animatorTime.isRunning())
+            return;
         mCurrentColor = mDefaultColor;
         mCurrentRadius = (int) mRadius;
         mCurrentState = HEART_VIEW;
@@ -431,5 +454,15 @@ public class LikeView extends View {
         mListener = l;
     }
 
+    /**
+     * Indicates whether this LikeView is  selected	 or not.
+     *
+     * @return true if the LikeView is selected now, false is deselected
+     */
+    public boolean getState() {
+        return this.state;
+
+
+    }
 
 }
