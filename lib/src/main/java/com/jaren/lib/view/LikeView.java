@@ -461,8 +461,16 @@ public class LikeView extends View {
      */
     public boolean getState() {
         return this.state;
-
-
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        if (animatorTime!=null)
+            animatorTime.removeAllListeners();
+        if (animatorArgb!=null)
+            animatorArgb.removeAllListeners();
+
+    }
 }
