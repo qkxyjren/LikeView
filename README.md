@@ -7,8 +7,14 @@ LikeView(Just like Twitter)
 
 How to use
 ----------
-	
-**1.Add naturalloadingview in your xml layout:**
+**to include naturalloadingview to your project:**
+
+add the dependency to the the  build.gradle file
+
+```gradle
+    compile 'com.jaren:likeview:1.0.0'
+```
+**Add naturalloadingview in your xml layout:**
 
   ```xml
      <com.jaren.lib.view.LikeView
@@ -19,17 +25,26 @@ How to use
         app:cycleTime="2000"
         app:defaultColor="#ff657487" />
 ```
-**2.Add OnClickListener in your Java file:**
+**Add OnClickListener :**
 
   ```java
 
-     lv = (LikeView) findViewById(R.id.lv);
+        lv = (LikeView) findViewById(R.id.lv);
         lv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("LikeView", "onClick"+lv.isChecked());
             }
         });
+```
+**Change the checked state :**
+
+  ```java
+
+           //Change the checked state of the view
+           lv.setChecked(true);
+           //Change the checked state of the view to the inverse of its current state
+           lv.toggle();
 ```
 LikeView has the following xml attributes
 ----------

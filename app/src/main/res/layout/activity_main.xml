@@ -30,9 +30,4 @@
     app:cycleTime="1600"
     app:defaultColor="#ffcc99cc"
     app:checkedColor="#ffff0000"/>
-
-  <Button
-    android:onClick="onClick"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"/>
 </LinearLayout>

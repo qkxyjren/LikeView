@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 
 dependencies {
@@ -34,7 +39,7 @@ dependencies {
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = 'Jaren'
+    userOrg = 'qkxyjren'
     groupId = 'com.jaren'
     artifactId = 'likeview'
     publishVersion = '1.0.0'

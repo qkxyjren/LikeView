@@ -24,12 +24,5 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("LikeView", "onClick"+lv.isChecked());
             }
         });
-
-    }
-
-    public void onClick(View view) {
-        lv.setChecked(false);
-        Log.i("LikeView", "onClick"+lv.isChecked());
-
     }
 }
