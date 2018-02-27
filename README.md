@@ -27,7 +27,7 @@ How to use
         lv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("LikeView", "onClick"+lv.getState());
+                Log.i("LikeView", "onClick"+lv.isChecked());
             }
         });
 ```
@@ -35,10 +35,10 @@ LikeView has the following xml attributes
 ----------
 You can customize the look and behavior of the `LikeView` in xml. Use the following attributes in xml.
 
-
-- `defaultColor`
-- `cirRadius`
-- `cycleTime`
+- `defaultColor` -unchecked color
+- `checkedColor` -checked color
+- `cirRadius` -the only attributes that can determine the LikeView size
+- `cycleTime` -the animation-duration(ms)
 
 Example
 ----------

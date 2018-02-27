@@ -21,10 +21,15 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("LikeView", "onClick"+lv.getState());
+                Log.i("LikeView", "onClick"+lv.isChecked());
             }
         });
 
+    }
+
+    public void onClick(View view) {
+        lv.setChecked(false);
+        Log.i("LikeView", "onClick"+lv.isChecked());
 
     }
 }

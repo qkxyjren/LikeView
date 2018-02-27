@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import android.widget.Checkable;
 import com.jaren.lib.R;
 
 
@@ -23,8 +24,10 @@ import com.jaren.lib.R;
  * by jaren on 2017/5/26.
  */
 
-public class LikeView extends View {
+public class LikeView extends View implements Checkable {
+
     private final int mDefaultColor;
+    private final int mCheckedColor;
     /**
      * 圆最大半径（心形）
      */
@@ -38,17 +41,23 @@ public class LikeView extends View {
      */
     private static final float c = 0.551915024494f;
     /**
-     * 选择/取消选择
+     * 是否点赞
      */
-    private boolean state;
+    private boolean isChecked;
     /**
-     * 心形默认颜色
+     * 心形默认选中颜色
      */
-    private static final int CLICKED_CLOLOR = 0xffe53a42;
+    private static final int CHECKED_CLOLOR = 0xffe53a42;
+    /**
+     * 心形默认未选中颜色
+     */
+    private static final int DEFAULT_COLOR =0Xff657487 ;
+
     /**
      * 环绕圆点的颜色
      */
-    private static final int[] dotColors = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed, 0xffb1eb99, 0xff67c9ad, 0xffde6bac};
+    private static final int[] dotColors = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
+        0xffb1eb99, 0xff67c9ad, 0xffde6bac};
     /**
      * 1.绘制心形并伴随缩小和颜色渐变
      */
@@ -112,11 +121,13 @@ public class LikeView extends View {
 
     public LikeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
-        TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.LikeView, defStyleAttr, 0);
+        TypedArray array = context.getTheme()
+            .obtainStyledAttributes(attrs, R.styleable.LikeView, defStyleAttr, 0);
         mRadius = array.getDimension(R.styleable.LikeView_cirRadius, dp2px(10));
         mCycleTime = array.getInt(R.styleable.LikeView_cycleTime, 2000);
-        mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, 0Xff657487);
+        mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR );
+        mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_CLOLOR );
+        array.recycle();
         mOffset = c * mRadius;
         mCenterX = mRadius;
         mCenterY = mRadius;
@@ -196,7 +207,8 @@ public class LikeView extends View {
             RectF rectF = new RectF(-radius, -radius, radius, radius);
             canvas.drawArc(rectF, 0, 360, false, mPaint);
         }
-        mCurrentPercent = (1f - mCurrentPercent > 1f ? 1f : 1f - mCurrentPercent) * 0.2f;//用于计算圆环宽度，最小0，与动画进度负相关
+        mCurrentPercent =
+            (1f - mCurrentPercent > 1f ? 1f : 1f - mCurrentPercent) * 0.2f;//用于计算圆环宽度，最小0，与动画进度负相关
         mPaint.setStrokeWidth(2 * mRadius * mCurrentPercent);
 
         float innerR = radius - mRadius * mCurrentPercent + dotR;
@@ -210,13 +222,17 @@ public class LikeView extends View {
 
         mPaint.setStyle(Paint.Style.FILL);
         for (int i = 0; i < 7; i++) {
-            canvas.drawCircle((float) (rDotS * Math.sin(angleA)), (float) (rDotS * Math.cos(angleA)), dotR, mPaint);
+            canvas
+                .drawCircle((float) (rDotS * Math.sin(angleA)), (float) (rDotS * Math.cos(angleA)),
+                    dotR, mPaint);
             angleA += 2 * Math.PI / 7;
-            canvas.drawCircle((float) (rDotL * Math.sin(angleB)), (float) (rDotL * Math.cos(angleB)), dotR, mPaint);
+            canvas
+                .drawCircle((float) (rDotL * Math.sin(angleB)), (float) (rDotL * Math.cos(angleB)),
+                    dotR, mPaint);
             angleB += 2 * Math.PI / 7;
         }
         mCurrentRadius = (int) (mRadius / 3 + offL * 4);
-        drawHeart(canvas, mCurrentRadius, CLICKED_CLOLOR);
+        drawHeart(canvas, mCurrentRadius, mCheckedColor);
 
     }
 
@@ -245,16 +261,21 @@ public class LikeView extends View {
             mCurrentRadius = (int) (mCurrentRadius - dotR / 16);
 
         }
-        drawHeart(canvas, mCurrentRadius, CLICKED_CLOLOR);
+        drawHeart(canvas, mCurrentRadius, mCheckedColor);
 
         mPaint.setAlpha((int) (255 * (1 - mCurrentPercent)));//圆点逐渐透明
         dotRS = (float) (dotR * (1 - mCurrentPercent));
-        dotRL = (float) (dotR * (1 - mCurrentPercent) * 4) > dotR ? dotR : (float) (dotR * (1 - mCurrentPercent) * 3);
+        dotRL = (float) (dotR * (1 - mCurrentPercent) * 4) > dotR ? dotR
+            : (float) (dotR * (1 - mCurrentPercent) * 3);
         for (int i = 0; i < 7; i++) {
             mPaint.setColor(dotColors[i]);
-            canvas.drawCircle((float) (rDotS * Math.sin(angleA)), (float) (rDotS * Math.cos(angleA)), dotRS, mPaint);
+            canvas
+                .drawCircle((float) (rDotS * Math.sin(angleA)), (float) (rDotS * Math.cos(angleA)),
+                    dotRS, mPaint);
             angleA += 2 * Math.PI / 7;
-            canvas.drawCircle((float) (rDotL * Math.sin(angleB)), (float) (rDotL * Math.cos(angleB)), dotRL, mPaint);
+            canvas
+                .drawCircle((float) (rDotL * Math.sin(angleB)), (float) (rDotL * Math.cos(angleB)),
+                    dotRL, mPaint);
             angleB += 2 * Math.PI / 7;
         }
 
@@ -304,8 +325,9 @@ public class LikeView extends View {
      * 展现View点击后的变化效果
      */
     private void startViewMotion() {
-        if (animatorTime != null && animatorTime.isRunning())
+        if (animatorTime != null && animatorTime.isRunning()) {
             return;
+        }
         resetState();
         animatorTime = ValueAnimator.ofInt(0, 1200);
         animatorTime.setDuration(mCycleTime);
@@ -318,7 +340,7 @@ public class LikeView extends View {
 
                 if (animatedValue == 0) {
                     if (animatorArgb == null || !animatorArgb.isRunning()) {
-                        animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, 0Xffde7bcc);//100?
+                        animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, 0Xffde7bcc);
                         animatorArgb.setDuration(mCycleTime * 28 / 120);
                         animatorArgb.setInterpolator(new LinearInterpolator());
                         animatorArgb.start();
@@ -326,24 +348,28 @@ public class LikeView extends View {
                 } else if (animatedValue <= 100) {
                     float percent = calcPercent(0f, 100f, animatedValue);
                     mCurrentRadius = (int) (mRadius - mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning())
+                    if (animatorArgb != null && animatorArgb.isRunning()) {
                         mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                    }
                     mCurrentState = HEART_VIEW;
                     invalidate();
 
                 } else if (animatedValue <= 280) {
                     float percent = calcPercent(100f, 340f, animatedValue);//此阶段未达到最大半径
                     mCurrentRadius = (int) (2 * mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning())
+                    if (animatorArgb != null && animatorArgb.isRunning()) {
                         mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                    }
                     mCurrentState = CIRCLE_VIEW;
                     invalidate();
                 } else if (animatedValue <= 340) {
                     float percent = calcPercent(100f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
-                    mCurrentPercent = 1f - percent + 0.2f > 1f ? 1f : 1f - percent + 0.2f;//用于计算圆环宽度，最小0.2，与动画进度负相关
+                    mCurrentPercent = 1f - percent + 0.2f > 1f ? 1f
+                        : 1f - percent + 0.2f;//用于计算圆环宽度，最小0.2，与动画进度负相关
                     mCurrentRadius = (int) (2 * mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning())
+                    if (animatorArgb != null && animatorArgb.isRunning()) {
                         mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                    }
                     mCurrentState = RING_VIEW;
                     invalidate();
                 } else if (animatedValue <= 480) {
@@ -382,9 +408,7 @@ public class LikeView extends View {
         rDotL = 0;
         offS = 0;
         offL = 0;
-        state = true;
-
-
+        isChecked = true;
     }
 
     private float calcPercent(float start, float end, float current) {
@@ -393,7 +417,6 @@ public class LikeView extends View {
 
 
     /**
-     * @param values
      * @return 由于颜色变化的动画API是SDK21 添加的，这里导入了源码的 ArgbEvaluator
      */
     private ValueAnimator ofArgb(int... values) {
@@ -404,13 +427,13 @@ public class LikeView extends View {
     }
 
     private float dp2px(int value) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
+        return TypedValue
+            .applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         int x = (int) event.getX();
         int y = (int) event.getY();
         int action = event.getAction();
@@ -422,13 +445,14 @@ public class LikeView extends View {
             case MotionEvent.ACTION_UP:
 
                 if (x + getLeft() < getRight() && y + getTop() < getBottom()) {//点击在View区域内
-                    if (state) {
-                        deselectLike();
+                    if (isChecked) {
+                        selectLike(false);
                     } else {
                         startViewMotion();
                     }
-                    if (mListener != null)
+                    if (mListener != null) {
                         mListener.onClick(this);
+                    }
                 }
                 break;
         }
@@ -437,15 +461,21 @@ public class LikeView extends View {
 
 
     /**
-     * 取消选择
+     * 选择/取消选择
      */
-    private void deselectLike() {
-        if (animatorTime != null && animatorTime.isRunning())
+    private void selectLike(boolean isSetChecked) {
+        if (animatorTime != null && animatorTime.isRunning()) {
             return;
-        mCurrentColor = mDefaultColor;
+        }
+        if (isSetChecked) {
+            mCurrentColor = mCheckedColor;
+            isChecked = true;
+        } else {
+            mCurrentColor = mDefaultColor;
+            isChecked = false;
+        }
         mCurrentRadius = (int) mRadius;
         mCurrentState = HEART_VIEW;
-        state = false;
         invalidate();
     }
 
@@ -454,23 +484,31 @@ public class LikeView extends View {
         mListener = l;
     }
 
-    /**
-     * Indicates whether this LikeView is  selected	 or not.
-     *
-     * @return true if the LikeView is selected now, false is deselected
-     */
-    public boolean getState() {
-        return this.state;
-    }
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-
-        if (animatorTime!=null)
+        if (animatorTime != null) {
             animatorTime.removeAllListeners();
-        if (animatorArgb!=null)
+        }
+        if (animatorArgb != null) {
             animatorArgb.removeAllListeners();
+        }
+    }
 
+    @Override
+    public void setChecked(boolean checked) {
+        if (this.isChecked != checked) {
+            selectLike(checked);
+        }
+    }
+
+    @Override
+    public boolean isChecked() {
+        return this.isChecked;
+    }
+
+    @Override
+    public void toggle() {
+        selectLike(!isChecked);
     }
 }

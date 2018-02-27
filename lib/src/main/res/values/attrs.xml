@@ -7,6 +7,7 @@
 
     <declare-styleable name="LikeView">
         <attr name="defaultColor" />
+        <attr name="checkedColor" />
         <attr name="cirRadius" />
         <attr name="cycleTime" />
     </declare-styleable>
