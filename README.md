@@ -7,7 +7,7 @@ LikeView(Just like Twitter)
 
 How to use
 ----------
-**to include naturalloadingview to your project:**
+**To include naturalloadingview to your project:**
 
 add the dependency to the the  build.gradle file
 
