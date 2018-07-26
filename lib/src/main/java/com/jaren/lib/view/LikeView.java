@@ -1,6 +1,9 @@
 package com.jaren.lib.view;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -11,10 +14,9 @@ import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-
+import android.view.animation.OvershootInterpolator;
 import android.widget.Checkable;
 import com.jaren.lib.R;
 
@@ -51,7 +53,7 @@ public class LikeView extends View implements Checkable {
     /**
      * 心形默认未选中颜色
      */
-    private static final int DEFAULT_COLOR =0Xff657487 ;
+    private static final int DEFAULT_COLOR = 0Xff657487;
 
     /**
      * 环绕圆点的颜色
@@ -86,6 +88,7 @@ public class LikeView extends View implements Checkable {
     private OnClickListener mListener;
     private ValueAnimator animatorTime;
     private ValueAnimator animatorArgb;
+    private AnimatorUpdateListener lvAnimatorUpdateListener;
     private int mCurrentRadius;
     private int mCurrentColor;
     private int mCurrentState;
@@ -109,6 +112,7 @@ public class LikeView extends View implements Checkable {
     private float offL;
     private boolean isMax;
     private float dotR;
+    private ObjectAnimator unselectAnimator;
 
 
     public LikeView(Context context) {
@@ -125,8 +129,8 @@ public class LikeView extends View implements Checkable {
             .obtainStyledAttributes(attrs, R.styleable.LikeView, defStyleAttr, 0);
         mRadius = array.getDimension(R.styleable.LikeView_cirRadius, dp2px(10));
         mCycleTime = array.getInt(R.styleable.LikeView_cycleTime, 2000);
-        mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR );
-        mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_CLOLOR );
+        mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR);
+        mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_CLOLOR);
         array.recycle();
         mOffset = c * mRadius;
         mCenterX = mRadius;
@@ -322,79 +326,91 @@ public class LikeView extends View implements Checkable {
 
 
     /**
-     * 展现View点击后的变化效果
+     * 展现View选中后的变化效果
      */
-    private void startViewMotion() {
-        if (animatorTime != null && animatorTime.isRunning()) {
-            return;
-        }
+    private void startSelectViewMotion() {
         resetState();
-        animatorTime = ValueAnimator.ofInt(0, 1200);
-        animatorTime.setDuration(mCycleTime);
-        animatorTime.setInterpolator(new LinearInterpolator());//需要随时间匀速变化
+        if (animatorTime == null) {
+            animatorTime = ValueAnimator.ofInt(0, 1200);
+            animatorTime.setDuration(mCycleTime);
+            animatorTime.setInterpolator(new LinearInterpolator());//需要随时间匀速变化
+        }
+        if (lvAnimatorUpdateListener == null) {
+            lvAnimatorUpdateListener = new LvAnimatorUpdateListener();
+            animatorTime.addUpdateListener(lvAnimatorUpdateListener);
+        }
         animatorTime.start();
-        animatorTime.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animatedValue = (int) animation.getAnimatedValue();
+    }
 
-                if (animatedValue == 0) {
-                    if (animatorArgb == null || !animatorArgb.isRunning()) {
-                        animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, 0Xffde7bcc);
-                        animatorArgb.setDuration(mCycleTime * 28 / 120);
-                        animatorArgb.setInterpolator(new LinearInterpolator());
-                        animatorArgb.start();
-                    }
-                } else if (animatedValue <= 100) {
-                    float percent = calcPercent(0f, 100f, animatedValue);
-                    mCurrentRadius = (int) (mRadius - mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning()) {
-                        mCurrentColor = (int) animatorArgb.getAnimatedValue();
-                    }
-                    mCurrentState = HEART_VIEW;
-                    invalidate();
+    private void startUnselectViewMotion() {
+        if (unselectAnimator==null) {
+            PropertyValuesHolder holderX = PropertyValuesHolder.ofFloat("scaleX", 1.0f, 0.8f, 1.0f);
+            PropertyValuesHolder holderY = PropertyValuesHolder.ofFloat("scaleY", 1.0f, 0.8f, 1.0f);
+            unselectAnimator = ObjectAnimator.ofPropertyValuesHolder(this, holderX, holderY)
+                .setDuration(60L);
+            unselectAnimator.setInterpolator(new OvershootInterpolator());
+        }
+        unselectAnimator.start();
+    }
 
-                } else if (animatedValue <= 280) {
-                    float percent = calcPercent(100f, 340f, animatedValue);//此阶段未达到最大半径
-                    mCurrentRadius = (int) (2 * mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning()) {
-                        mCurrentColor = (int) animatorArgb.getAnimatedValue();
-                    }
-                    mCurrentState = CIRCLE_VIEW;
-                    invalidate();
-                } else if (animatedValue <= 340) {
-                    float percent = calcPercent(100f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
-                    mCurrentPercent = 1f - percent + 0.2f > 1f ? 1f
-                        : 1f - percent + 0.2f;//用于计算圆环宽度，最小0.2，与动画进度负相关
-                    mCurrentRadius = (int) (2 * mRadius * percent);
-                    if (animatorArgb != null && animatorArgb.isRunning()) {
-                        mCurrentColor = (int) animatorArgb.getAnimatedValue();
-                    }
-                    mCurrentState = RING_VIEW;
-                    invalidate();
-                } else if (animatedValue <= 480) {
-                    float percent = calcPercent(340f, 480f, animatedValue);//内环半径增大直至消亡
-                    mCurrentPercent = percent;
-                    mCurrentRadius = (int) (2 * mRadius);//外环半径不再改变
-                    mCurrentState = RING_DOT__HEART_VIEW;
-                    invalidate();
-                } else if (animatedValue <= 1200) {
-                    float percent = calcPercent(480f, 1200f, animatedValue);
-                    mCurrentPercent = percent;
-                    mCurrentState = DOT__HEART_VIEW;
-                    if (animatedValue == 1200) {
-                        animatorTime.cancel();
-                        animatorTime.removeAllListeners();
-                    }
-                    invalidate();
+    private class LvAnimatorUpdateListener implements AnimatorUpdateListener {
 
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            int animatedValue = (int) animation.getAnimatedValue();
+            if (animatedValue == 0) {
+                if (animatorArgb == null || !animatorArgb.isRunning()) {
+                    animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, 0Xffde7bcc);
+                    animatorArgb.setDuration(mCycleTime * 28 / 120);
+                    animatorArgb.setInterpolator(new LinearInterpolator());
+                    animatorArgb.start();
                 }
+            } else if (animatedValue <= 100) {
+                float percent = calcPercent(0f, 100f, animatedValue);
+                mCurrentRadius = (int) (mRadius - mRadius * percent);
+                if (animatorArgb != null && animatorArgb.isRunning()) {
+                    mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                }
+                mCurrentState = HEART_VIEW;
+                invalidate();
 
-
+            } else if (animatedValue <= 280) {
+                float percent = calcPercent(100f, 340f, animatedValue);//此阶段未达到最大半径
+                mCurrentRadius = (int) (2 * mRadius * percent);
+                if (animatorArgb != null && animatorArgb.isRunning()) {
+                    mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                }
+                mCurrentState = CIRCLE_VIEW;
+                invalidate();
+            } else if (animatedValue <= 340) {
+                float percent = calcPercent(100f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
+                mCurrentPercent = 1f - percent + 0.2f > 1f ? 1f
+                    : 1f - percent + 0.2f;//用于计算圆环宽度，最小0.2，与动画进度负相关
+                mCurrentRadius = (int) (2 * mRadius * percent);
+                if (animatorArgb != null && animatorArgb.isRunning()) {
+                    mCurrentColor = (int) animatorArgb.getAnimatedValue();
+                }
+                mCurrentState = RING_VIEW;
+                invalidate();
+            } else if (animatedValue <= 480) {
+                float percent = calcPercent(340f, 480f, animatedValue);//内环半径增大直至消亡
+                mCurrentPercent = percent;
+                mCurrentRadius = (int) (2 * mRadius);//外环半径不再改变
+                mCurrentState = RING_DOT__HEART_VIEW;
+                invalidate();
+            } else if (animatedValue <= 1200) {
+                float percent = calcPercent(480f, 1200f, animatedValue);
+                mCurrentPercent = percent;
+                mCurrentState = DOT__HEART_VIEW;
+                invalidate();
+                if (animatedValue == 1200) {
+                    animatorTime.cancel();
+                    if (!isChecked){
+                        restoreDefaultView();
+                    }
+                }
             }
-        });
-
-
+        }
     }
 
     /**
@@ -408,7 +424,6 @@ public class LikeView extends View implements Checkable {
         rDotL = 0;
         offS = 0;
         offL = 0;
-        isChecked = true;
     }
 
     private float calcPercent(float start, float end, float current) {
@@ -431,57 +446,58 @@ public class LikeView extends View implements Checkable {
             .applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
-        int action = event.getAction();
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                break;
-            case MotionEvent.ACTION_MOVE:
-                break;
-            case MotionEvent.ACTION_UP:
-
-                if (x + getLeft() < getRight() && y + getTop() < getBottom()) {//点击在View区域内
-                    if (isChecked) {
-                        selectLike(false);
-                    } else {
-                        startViewMotion();
-                    }
-                    if (mListener != null) {
-                        mListener.onClick(this);
-                    }
-                }
-                break;
+    /**
+     * 选择/取消选择 有动画
+     */
+    private void selectLike(boolean isSetChecked) {
+        if (isSetChecked) {
+            cancelAnimator();
+            isChecked = true;
+            startSelectViewMotion();
+        } else {
+            isChecked = false;
+            if (!isAnimatorTimeRunning()) {
+                restoreDefaultView();
+                startUnselectViewMotion();
+            }
         }
-        return true;
+
     }
 
 
     /**
-     * 选择/取消选择
+     * 选择/取消选择 无动画
      */
-    private void selectLike(boolean isSetChecked) {
-        if (animatorTime != null && animatorTime.isRunning()) {
-            return;
-        }
+    private void selectLikeWithoutAnimator(boolean isSetChecked) {
+        cancelAnimator();
         if (isSetChecked) {
             mCurrentColor = mCheckedColor;
             isChecked = true;
+            mCurrentRadius = (int) mRadius;
+            mCurrentState = HEART_VIEW;
+            invalidate();
         } else {
-            mCurrentColor = mDefaultColor;
             isChecked = false;
+            restoreDefaultView();
         }
+
+    }
+
+    private void restoreDefaultView() {
+        mCurrentColor = mDefaultColor;
         mCurrentRadius = (int) mRadius;
         mCurrentState = HEART_VIEW;
         invalidate();
     }
 
-    @Override
-    public void setOnClickListener(@Nullable OnClickListener l) {
-        mListener = l;
+    private void cancelAnimator() {
+        if (isAnimatorTimeRunning()) {
+            animatorTime.cancel();
+        }
+    }
+
+    private boolean isAnimatorTimeRunning() {
+        return animatorTime != null && animatorTime.isRunning();
     }
 
     @Override
@@ -493,13 +509,18 @@ public class LikeView extends View implements Checkable {
         if (animatorArgb != null) {
             animatorArgb.removeAllListeners();
         }
+        clearAnimation();
     }
 
     @Override
     public void setChecked(boolean checked) {
         if (this.isChecked != checked) {
-            selectLike(checked);
         }
+        selectLike(checked);
+    }
+
+    public void setCheckedWithoutAnimator(boolean checked) {
+        selectLikeWithoutAnimator(checked);
     }
 
     @Override
@@ -510,5 +531,9 @@ public class LikeView extends View implements Checkable {
     @Override
     public void toggle() {
         selectLike(!isChecked);
+    }
+
+    public void toggleWithoutAnimator() {
+        selectLikeWithoutAnimator(!isChecked);
     }
 }
