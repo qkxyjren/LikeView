@@ -12,7 +12,7 @@ How to use
 add the dependency to the the  build.gradle file
 
 ```gradle
-    compile 'com.jaren:likeview:1.0.0'
+    compile 'com.jaren:likeview:1.1.0'
 ```
 **Add naturalloadingview in your xml layout:**
 
@@ -30,12 +30,29 @@ add the dependency to the the  build.gradle file
   ```java
 
         lv = (LikeView) findViewById(R.id.lv);
-        lv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("LikeView", "onClick"+lv.isChecked());
-            }
-        });
+        lv..setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View v) {
+                           mLvTop.toggle();
+                           requestPraise(new Callback() {
+                               @Override
+                               public void onSuccess() {
+                                   Log.i("LikeView", "onClick onSuccess mLvTop.isChecked():" + mLvTop.isChecked());
+                               }
+                               @Override
+                               public void onFail() {
+                                   mLvTop.toggleWithoutAnimator();
+           //                        or
+           //                        if (mLvTop.isChecked()) {
+           //                            mLvTop.setChecked(false);
+           //                        } else {
+           //                            mLvTop.setCheckedWithoutAnimator(true);
+           //                        }
+                                   Log.i("LikeView", "onClick onFail  mLvTop.isChecked():" + mLvTop.isChecked());
+                               }
+                           });
+                       }
+                   });
 ```
 **Change the checked state :**
 
@@ -43,9 +60,11 @@ add the dependency to the the  build.gradle file
 
         //Change the checked state of the view
         lv.setChecked(true);
+        lv.setCheckedWithoutAnimator(true);
 
         //Change the checked state of the view to the inverse of its current state
         lv.toggle();
+        lv.toggleWithoutAnimator();
 ```
 LikeView has the following xml attributes
 ----------
@@ -61,7 +80,14 @@ Example
 [Examples](https://github.com/qkxyjren/LikeView/tree/master/app)
 
 Change log
----------
+----------
+**1.1.0**
+- no longer change checked state within the LikeView itself
+- add `setCheckedWithoutAnimator(boolean checked)`
+- add `toggleWithoutAnimator()`
+
+**1.0.0**
+
 License
 ----------
 
