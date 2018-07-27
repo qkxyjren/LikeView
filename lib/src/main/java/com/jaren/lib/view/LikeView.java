@@ -343,7 +343,7 @@ public class LikeView extends View implements Checkable {
     }
 
     private void startUnselectViewMotion() {
-        if (unselectAnimator==null) {
+        if (unselectAnimator == null) {
             PropertyValuesHolder holderX = PropertyValuesHolder.ofFloat("scaleX", 1.0f, 0.8f, 1.0f);
             PropertyValuesHolder holderY = PropertyValuesHolder.ofFloat("scaleY", 1.0f, 0.8f, 1.0f);
             unselectAnimator = ObjectAnimator.ofPropertyValuesHolder(this, holderX, holderY)
@@ -405,7 +405,7 @@ public class LikeView extends View implements Checkable {
                 invalidate();
                 if (animatedValue == 1200) {
                     animatorTime.cancel();
-                    if (!isChecked){
+                    if (!isChecked) {
                         restoreDefaultView();
                     }
                 }
@@ -446,16 +446,16 @@ public class LikeView extends View implements Checkable {
             .applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
 
+
     /**
      * 选择/取消选择 有动画
      */
     private void selectLike(boolean isSetChecked) {
+        isChecked=isSetChecked;
         if (isSetChecked) {
             cancelAnimator();
-            isChecked = true;
             startSelectViewMotion();
         } else {
-            isChecked = false;
             if (!isAnimatorTimeRunning()) {
                 restoreDefaultView();
                 startUnselectViewMotion();
@@ -469,15 +469,14 @@ public class LikeView extends View implements Checkable {
      * 选择/取消选择 无动画
      */
     private void selectLikeWithoutAnimator(boolean isSetChecked) {
+        isChecked=isSetChecked;
         cancelAnimator();
         if (isSetChecked) {
             mCurrentColor = mCheckedColor;
-            isChecked = true;
             mCurrentRadius = (int) mRadius;
             mCurrentState = HEART_VIEW;
             invalidate();
         } else {
-            isChecked = false;
             restoreDefaultView();
         }
 
@@ -514,18 +513,15 @@ public class LikeView extends View implements Checkable {
 
     @Override
     public void setChecked(boolean checked) {
-        if (this.isChecked != checked) {
-        }
         selectLike(checked);
     }
 
+    /**
+     * the method is equivalent to {@link #setChecked(boolean)}<br>
+     * but it performs no animator and it will cancel the  animator is running.
+     */
     public void setCheckedWithoutAnimator(boolean checked) {
         selectLikeWithoutAnimator(checked);
-    }
-
-    @Override
-    public boolean isChecked() {
-        return this.isChecked;
     }
 
     @Override
@@ -533,7 +529,16 @@ public class LikeView extends View implements Checkable {
         selectLike(!isChecked);
     }
 
+    /**
+     * the method is equivalent to {@link  #toggle()}<br>
+     * but it performs no animator and it will cancel the  animator is running.
+     */
     public void toggleWithoutAnimator() {
         selectLikeWithoutAnimator(!isChecked);
+    }
+
+    @Override
+    public boolean isChecked() {
+        return this.isChecked;
     }
 }
