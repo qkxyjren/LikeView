@@ -30,8 +30,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:cirRadius="40dp"
-    app:cycleTime="1600"
+    app:cycleTime="6600"
     app:defaultColor="#ffcc99cc"
-    app:checkedColor="#ffff0000"/>
-
+    app:checkedColor="#ffff6600"/>
+  <com.jaren.lib.view.LikeView
+    android:id="@+id/lv_bottom2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cirRadius="40dp"
+    android:visibility="visible"
+    app:cycleTime="6600"
+    app:defaultLikeIconRes="@mipmap/btn_check_buttonless_off"
+    app:checkedLikeIconRes="@mipmap/btn_check_buttonless_on"
+    />
 </LinearLayout>

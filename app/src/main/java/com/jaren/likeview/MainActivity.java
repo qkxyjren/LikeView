@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private LikeView mLvTop;
     private LikeView mLvCenter;
     private LikeView mLvBottom;
+    private LikeView mLvBottom2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +23,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mLvTop = (LikeView) findViewById(R.id.lv_top);
         mLvCenter = (LikeView) findViewById(R.id.lv_center);
         mLvBottom = (LikeView) findViewById(R.id.lv_bottom);
+        mLvBottom2 = (LikeView) findViewById(R.id.lv_bottom2);
         mLvTop.setOnClickListener(this);
         mLvCenter.setOnClickListener(this);
         mLvBottom.setOnClickListener(this);
+        mLvBottom2.setOnClickListener(this);
         mLvTop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 break;
             case R.id.lv_bottom:
                 mLvBottom.toggle();
+                break;  case R.id.lv_bottom2:
+                mLvBottom2.toggle();
                 break;
         }
     }

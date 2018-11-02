@@ -2,14 +2,19 @@
 <resources>
 
     <attr name="defaultColor" format="color"></attr>
+    <attr name="checkedColor" format="color"></attr>
     <attr name="cirRadius" format="dimension"></attr>
     <attr name="cycleTime" format="integer"></attr>
+    <attr name="defaultLikeIconRes" format="reference"></attr>
+    <attr name="checkedLikeIconRes" format="reference"></attr>
 
     <declare-styleable name="LikeView">
         <attr name="defaultColor" />
         <attr name="checkedColor" />
         <attr name="cirRadius" />
         <attr name="cycleTime" />
+        <attr name="defaultLikeIconRes" />
+        <attr name="checkedLikeIconRes" />
     </declare-styleable>
 
 

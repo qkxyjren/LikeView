@@ -1,5 +1,6 @@
 package com.jaren.lib.view;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -11,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -30,6 +32,8 @@ public class LikeView extends View implements Checkable {
 
     private final int mDefaultColor;
     private final int mCheckedColor;
+    private  Drawable mDefaultIcon;
+    private  Drawable mCheckedIcon;
     /**
      * 圆最大半径（心形）
      */
@@ -131,6 +135,12 @@ public class LikeView extends View implements Checkable {
         mCycleTime = array.getInt(R.styleable.LikeView_cycleTime, 2000);
         mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR);
         mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_CLOLOR);
+        if (array.hasValue(R.styleable.LikeView_defaultLikeIconRes)){
+            mDefaultIcon= array.getDrawable(R.styleable.LikeView_defaultLikeIconRes);
+        }
+        if (array.hasValue(R.styleable.LikeView_checkedLikeIconRes)){
+            mCheckedIcon= array.getDrawable(R.styleable.LikeView_checkedLikeIconRes);
+        }
         array.recycle();
         mOffset = c * mRadius;
         mCenterX = mRadius;
@@ -163,22 +173,32 @@ public class LikeView extends View implements Checkable {
                 drawDot(canvas, mCurrentRadius, mCurrentColor);
                 break;
         }
+
     }
 
 
     //绘制心形
     private void drawHeart(Canvas canvas, int radius, int color) {
-        initControlPoints(radius);
-        mPaint.setColor(color);
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL);
-        Path path = new Path();
-        path.moveTo(tPointB.x, tPointB.y);
-        path.cubicTo(tPointC.x, tPointC.y, rPointA.x, rPointA.y, rPointB.x, rPointB.y);
-        path.cubicTo(rPointC.x, rPointC.y, bPointC.x, bPointC.y, bPointB.x, bPointB.y);
-        path.cubicTo(bPointA.x, bPointA.y, lPointC.x, lPointC.y, lPointB.x, lPointB.y);
-        path.cubicTo(lPointA.x, lPointA.y, tPointA.x, tPointA.y, tPointB.x, tPointB.y);
-        canvas.drawPath(path, mPaint);
+        if (isHasIcon()){
+            mCheckedIcon.setBounds(-radius,-radius,radius,radius);
+            mCheckedIcon.draw(canvas);
+        }else {
+            initControlPoints(radius);
+            mPaint.setColor(color);
+            mPaint.setAntiAlias(true);
+            mPaint.setStyle(Paint.Style.FILL);
+            Path path = new Path();
+            path.moveTo(tPointB.x, tPointB.y);
+            path.cubicTo(tPointC.x, tPointC.y, rPointA.x, rPointA.y, rPointB.x, rPointB.y);
+            path.cubicTo(rPointC.x, rPointC.y, bPointC.x, bPointC.y, bPointB.x, bPointB.y);
+            path.cubicTo(bPointA.x, bPointA.y, lPointC.x, lPointC.y, lPointB.x, lPointB.y);
+            path.cubicTo(lPointA.x, lPointA.y, tPointA.x, tPointA.y, tPointB.x, tPointB.y);
+            canvas.drawPath(path, mPaint);
+        }
+    }
+
+    private boolean isHasIcon() {
+        return mCheckedIcon!=null&&mDefaultIcon!=null;
     }
 
     //绘制圆
@@ -502,14 +522,19 @@ public class LikeView extends View implements Checkable {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (animatorTime != null) {
-            animatorTime.removeAllListeners();
-        }
-        if (animatorArgb != null) {
-            animatorArgb.removeAllListeners();
-        }
-        clearAnimation();
+        releaseAnimator(animatorTime);
+        releaseAnimator(animatorArgb);
+        releaseAnimator(unselectAnimator);
     }
+
+    private void releaseAnimator(Animator animator ) {
+        if (animator != null) {
+            animator.removeAllListeners();
+            animator.cancel();
+        }
+    }
+
+    /*=========================================public=========================================*/
 
     @Override
     public void setChecked(boolean checked) {
@@ -518,7 +543,7 @@ public class LikeView extends View implements Checkable {
 
     /**
      * the method is equivalent to {@link #setChecked(boolean)}<br>
-     * but it performs no animator and it will cancel the  animator is running.
+     * but it performs no animator and it will cancel the  animator that is running.
      */
     public void setCheckedWithoutAnimator(boolean checked) {
         selectLikeWithoutAnimator(checked);
@@ -531,7 +556,7 @@ public class LikeView extends View implements Checkable {
 
     /**
      * the method is equivalent to {@link  #toggle()}<br>
-     * but it performs no animator and it will cancel the  animator is running.
+     * but it performs no animator and it will cancel the  animator that is running.
      */
     public void toggleWithoutAnimator() {
         selectLikeWithoutAnimator(!isChecked);
