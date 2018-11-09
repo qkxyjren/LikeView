@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="create with image icon"
+    android:textColor="@color/colorAccent"/>
+  <com.jaren.lib.view.LikeView
+    android:id="@+id/lv"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    app:checkedColor="#ffff0000"
+    app:cirRadius="40dp"
+    app:cycleTime="3600"
+    app:defaultColor="#ffcc9999"/>
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="create with image icon"
+    android:textColor="@color/colorAccent"/>
+  <com.jaren.lib.view.LikeView
+    android:id="@+id/lv_set"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    app:checkedColor="#ffff0000"
+    app:cirRadius="40dp"
+    app:cycleTime="1600"
+    app:unSelectCycleTime="300"
+    app:defaultColor="#ffcccccc"/>
+</LinearLayout>

@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <attr name="defaultColor" format="color"></attr>
-    <attr name="checkedColor" format="color"></attr>
-    <attr name="cirRadius" format="dimension"></attr>
-    <attr name="cycleTime" format="integer"></attr>
-    <attr name="defaultLikeIconRes" format="reference"></attr>
-    <attr name="checkedLikeIconRes" format="reference"></attr>
+  <attr format="color" name="defaultColor"></attr>
+  <attr format="color" name="checkedColor"></attr>
+  <attr format="dimension" name="cirRadius"></attr>
+  <attr format="integer" name="cycleTime"></attr>
+  <attr format="integer" name="unSelectCycleTime"></attr>
+  <attr format="reference" name="defaultLikeIconRes"></attr>
+  <attr format="reference" name="checkedLikeIconRes"></attr>
+  <attr format="float" name="lrGroupCRatio"></attr>
+  <attr format="float" name="lrGroupBRatio"></attr>
+  <attr format="float" name="bGroupACRatio"></attr>
+  <attr format="float" name="tGroupBRatio"></attr>
 
-    <declare-styleable name="LikeView">
-        <attr name="defaultColor" />
-        <attr name="checkedColor" />
-        <attr name="cirRadius" />
-        <attr name="cycleTime" />
-        <attr name="defaultLikeIconRes" />
-        <attr name="checkedLikeIconRes" />
-    </declare-styleable>
-
+  <declare-styleable name="LikeView">
+    <attr name="defaultColor"/>
+    <attr name="checkedColor"/>
+    <attr name="cirRadius"/>
+    <attr name="cycleTime"/>
+    <attr name="unSelectCycleTime"/>
+    <attr name="defaultLikeIconRes"/>
+    <attr name="checkedLikeIconRes"/>
+    <attr name="lrGroupCRatio"/>
+    <attr name="lrGroupBRatio"/>
+    <attr name="bGroupACRatio"/>
+    <attr name="tGroupBRatio"/>
+  </declare-styleable>
 
 
 </resources>

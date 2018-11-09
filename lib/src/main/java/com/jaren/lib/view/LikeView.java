@@ -9,8 +9,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -30,8 +28,12 @@ import com.jaren.lib.R;
 
 public class LikeView extends View implements Checkable {
 
-    private final int mDefaultColor;
-    private final int mCheckedColor;
+    private  int mDefaultColor;
+    private  int mCheckedColor;
+    private  float mLrGroupCRatio;
+    private  float mLrGroupBRatio;
+    private  float mBGroupACRatio;
+    private  float mTGroupBRatio;
     private  Drawable mDefaultIcon;
     private  Drawable mCheckedIcon;
     /**
@@ -39,13 +41,15 @@ public class LikeView extends View implements Checkable {
      */
     private float mRadius;
     /**
-     * View变化用时
+     * View选中用时
      */
     private int mCycleTime;
+
     /**
-     * Bézier曲线画圆的近似常数
+     * View取消选中用时
      */
-    private static final float c = 0.551915024494f;
+    private  int mUnSelectCycleTime;
+
     /**
      * 是否点赞
      */
@@ -53,43 +57,26 @@ public class LikeView extends View implements Checkable {
     /**
      * 心形默认选中颜色
      */
-    private static final int CHECKED_CLOLOR = 0xffe53a42;
+    public static final int CHECKED_COLOR = 0xffe53a42;
     /**
      * 心形默认未选中颜色
      */
-    private static final int DEFAULT_COLOR = 0Xff657487;
+    public static final int DEFAULT_COLOR = 0Xff657487;
+
+    public static final int DEFAULT_CYCLE_TIME = 2000;
+
+    public static final int DEFAULT_UN_SELECT_CYCLE_TIME = 200;
 
     /**
      * 环绕圆点的颜色
      */
     private static final int[] dotColors = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
         0xffb1eb99, 0xff67c9ad, 0xffde6bac};
-    /**
-     * 1.绘制心形并伴随缩小和颜色渐变
-     */
-    private static final int HEART_VIEW = 0;
-    /**
-     * 2.绘制圆并伴随放大和颜色渐变
-     */
-    private static final int CIRCLE_VIEW = 1;
-    /**
-     * 3.绘制圆环并伴随放大和颜色渐变
-     */
-    private static final int RING_VIEW = 2;
-    /**
-     * 4.圆环减消失、心形放大、周围环绕十四圆点
-     */
-    private static final int RING_DOT__HEART_VIEW = 3;
-    /**
-     * 5.环绕的十四圆点向外移动并缩小、透明度渐变、渐隐
-     */
-    private static final int DOT__HEART_VIEW = 4;
+
 
     private float mCenterX;
     private float mCenterY;
     private Paint mPaint;
-    private float mOffset;
-    private OnClickListener mListener;
     private ValueAnimator animatorTime;
     private ValueAnimator animatorArgb;
     private AnimatorUpdateListener lvAnimatorUpdateListener;
@@ -97,19 +84,6 @@ public class LikeView extends View implements Checkable {
     private int mCurrentColor;
     private int mCurrentState;
     private float mCurrentPercent;
-
-    private PointF tPointA;
-    private PointF tPointB;
-    private PointF tPointC;
-    private PointF rPointA;
-    private PointF rPointB;
-    private PointF rPointC;
-    private PointF bPointA;
-    private PointF bPointB;
-    private PointF bPointC;
-    private PointF lPointA;
-    private PointF lPointB;
-    private PointF lPointC;
     private float rDotL;
     private float rDotS;
     private float offS;
@@ -117,6 +91,7 @@ public class LikeView extends View implements Checkable {
     private boolean isMax;
     private float dotR;
     private ObjectAnimator unselectAnimator;
+    private HeartShapePathController mHeartShapePathController;
 
 
     public LikeView(Context context) {
@@ -129,12 +104,16 @@ public class LikeView extends View implements Checkable {
 
     public LikeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray array = context.getTheme()
-            .obtainStyledAttributes(attrs, R.styleable.LikeView, defStyleAttr, 0);
+        TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.LikeView, defStyleAttr, 0);
         mRadius = array.getDimension(R.styleable.LikeView_cirRadius, dp2px(10));
-        mCycleTime = array.getInt(R.styleable.LikeView_cycleTime, 2000);
+        mCycleTime = array.getInt(R.styleable.LikeView_cycleTime, DEFAULT_CYCLE_TIME);
+        mUnSelectCycleTime = array.getInt(R.styleable.LikeView_unSelectCycleTime, DEFAULT_UN_SELECT_CYCLE_TIME);
         mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR);
-        mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_CLOLOR);
+        mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_COLOR);
+        mLrGroupCRatio = array.getFloat(R.styleable.LikeView_lrGroupCRatio, HeartShapePathController.LR_GROUP_C_RATIO);
+        mLrGroupBRatio = array.getFloat(R.styleable.LikeView_lrGroupBRatio, HeartShapePathController.LR_GROUP_B_RATIO);
+        mBGroupACRatio = array.getFloat(R.styleable.LikeView_bGroupACRatio, HeartShapePathController.B_GROUP_AC_RATIO);
+        mTGroupBRatio = array.getFloat(R.styleable.LikeView_tGroupBRatio, HeartShapePathController.T_GROUP_B_RATIO);
         if (array.hasValue(R.styleable.LikeView_defaultLikeIconRes)){
             mDefaultIcon= array.getDrawable(R.styleable.LikeView_defaultLikeIconRes);
         }
@@ -142,11 +121,10 @@ public class LikeView extends View implements Checkable {
             mCheckedIcon= array.getDrawable(R.styleable.LikeView_checkedLikeIconRes);
         }
         array.recycle();
-        mOffset = c * mRadius;
-        mCenterX = mRadius;
-        mCenterY = mRadius;
+        mCenterX =mRadius;
+        mCenterY =mRadius;
         mPaint = new Paint();
-        mCurrentRadius = (int) mRadius;
+        mCurrentRadius = (int)mRadius;
         mCurrentColor = mDefaultColor;
         dotR = mRadius / 6;
 
@@ -157,43 +135,40 @@ public class LikeView extends View implements Checkable {
         super.onDraw(canvas);
         canvas.translate(mCenterX, mCenterY);//使坐标原点在canvas中心位置
         switch (mCurrentState) {
-            case HEART_VIEW:
-                drawHeart(canvas, mCurrentRadius, mCurrentColor);
+            case State.HEART_VIEW:
+                drawInnerShape(canvas, mCurrentRadius, false);
                 break;
-            case CIRCLE_VIEW:
+            case State.CIRCLE_VIEW:
                 drawCircle(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case RING_VIEW:
+            case State.RING_VIEW:
                 drawRing(canvas, mCurrentRadius, mCurrentColor, mCurrentPercent);
                 break;
-            case RING_DOT__HEART_VIEW:
+            case State.RING_DOT__HEART_VIEW:
                 drawDotWithRing(canvas, mCurrentRadius, mCurrentColor);
                 break;
-            case DOT__HEART_VIEW:
+            case State.DOT__HEART_VIEW:
                 drawDot(canvas, mCurrentRadius, mCurrentColor);
                 break;
         }
-
     }
 
 
-    //绘制心形
-    private void drawHeart(Canvas canvas, int radius, int color) {
+    //绘制内部图形
+    private void drawInnerShape(Canvas canvas, int radius, boolean isChecked) {
         if (isHasIcon()){
-            mCheckedIcon.setBounds(-radius,-radius,radius,radius);
-            mCheckedIcon.draw(canvas);
+            Drawable icon=isChecked?mCheckedIcon:mDefaultIcon;
+            icon.setBounds(-radius,-radius,radius,radius);
+            icon.draw(canvas);
         }else {
-            initControlPoints(radius);
+            int color=isChecked?mCheckedColor:mCurrentColor;
             mPaint.setColor(color);
             mPaint.setAntiAlias(true);
+            mPaint.setDither(true);
             mPaint.setStyle(Paint.Style.FILL);
-            Path path = new Path();
-            path.moveTo(tPointB.x, tPointB.y);
-            path.cubicTo(tPointC.x, tPointC.y, rPointA.x, rPointA.y, rPointB.x, rPointB.y);
-            path.cubicTo(rPointC.x, rPointC.y, bPointC.x, bPointC.y, bPointB.x, bPointB.y);
-            path.cubicTo(bPointA.x, bPointA.y, lPointC.x, lPointC.y, lPointB.x, lPointB.y);
-            path.cubicTo(lPointA.x, lPointA.y, tPointA.x, tPointA.y, tPointB.x, tPointB.y);
-            canvas.drawPath(path, mPaint);
+            mHeartShapePathController=new HeartShapePathController(mLrGroupCRatio,mLrGroupBRatio ,mBGroupACRatio,
+                mTGroupBRatio);
+            canvas.drawPath(mHeartShapePathController.getPath(radius), mPaint);
         }
     }
 
@@ -256,7 +231,7 @@ public class LikeView extends View implements Checkable {
             angleB += 2 * Math.PI / 7;
         }
         mCurrentRadius = (int) (mRadius / 3 + offL * 4);
-        drawHeart(canvas, mCurrentRadius, mCheckedColor);
+        drawInnerShape(canvas, mCurrentRadius, true);
 
     }
 
@@ -285,7 +260,7 @@ public class LikeView extends View implements Checkable {
             mCurrentRadius = (int) (mCurrentRadius - dotR / 16);
 
         }
-        drawHeart(canvas, mCurrentRadius, mCheckedColor);
+        drawInnerShape(canvas, mCurrentRadius, true);
 
         mPaint.setAlpha((int) (255 * (1 - mCurrentPercent)));//圆点逐渐透明
         dotRS = (float) (dotR * (1 - mCurrentPercent));
@@ -322,30 +297,6 @@ public class LikeView extends View implements Checkable {
     }
 
     /**
-     * 初始化Bézier 曲线四组控制点
-     */
-    private void initControlPoints(int mRadius) {
-        mOffset = c * mRadius;
-
-        tPointA = new PointF(-mOffset, -mRadius);
-        tPointB = new PointF(0, -mRadius * 0.5f);
-        tPointC = new PointF(mOffset, -mRadius);
-
-        rPointA = new PointF(mRadius, -mOffset);
-        rPointB = new PointF(mRadius, 0);
-        rPointC = new PointF(mRadius * 0.9f, mOffset);
-
-        bPointA = new PointF(-mOffset, mRadius * 0.7f);
-        bPointB = new PointF(0, mRadius);
-        bPointC = new PointF(mOffset, mRadius * 0.7f);
-
-        lPointA = new PointF(-mRadius, -mOffset);
-        lPointB = new PointF(-mRadius, 0);
-        lPointC = new PointF(-mRadius * 0.9f, mOffset);
-    }
-
-
-    /**
      * 展现View选中后的变化效果
      */
     private void startSelectViewMotion() {
@@ -366,8 +317,7 @@ public class LikeView extends View implements Checkable {
         if (unselectAnimator == null) {
             PropertyValuesHolder holderX = PropertyValuesHolder.ofFloat("scaleX", 1.0f, 0.8f, 1.0f);
             PropertyValuesHolder holderY = PropertyValuesHolder.ofFloat("scaleY", 1.0f, 0.8f, 1.0f);
-            unselectAnimator = ObjectAnimator.ofPropertyValuesHolder(this, holderX, holderY)
-                .setDuration(60L);
+            unselectAnimator = ObjectAnimator.ofPropertyValuesHolder(this, holderX, holderY).setDuration(mUnSelectCycleTime);
             unselectAnimator.setInterpolator(new OvershootInterpolator());
         }
         unselectAnimator.start();
@@ -391,7 +341,7 @@ public class LikeView extends View implements Checkable {
                 if (animatorArgb != null && animatorArgb.isRunning()) {
                     mCurrentColor = (int) animatorArgb.getAnimatedValue();
                 }
-                mCurrentState = HEART_VIEW;
+                mCurrentState = State.HEART_VIEW;
                 invalidate();
 
             } else if (animatedValue <= 280) {
@@ -400,7 +350,7 @@ public class LikeView extends View implements Checkable {
                 if (animatorArgb != null && animatorArgb.isRunning()) {
                     mCurrentColor = (int) animatorArgb.getAnimatedValue();
                 }
-                mCurrentState = CIRCLE_VIEW;
+                mCurrentState =  State.CIRCLE_VIEW;
                 invalidate();
             } else if (animatedValue <= 340) {
                 float percent = calcPercent(100f, 340f, animatedValue);//半径接上一阶段增加，此阶段外环半径已经最大值
@@ -410,18 +360,18 @@ public class LikeView extends View implements Checkable {
                 if (animatorArgb != null && animatorArgb.isRunning()) {
                     mCurrentColor = (int) animatorArgb.getAnimatedValue();
                 }
-                mCurrentState = RING_VIEW;
+                mCurrentState =  State.RING_VIEW;
                 invalidate();
             } else if (animatedValue <= 480) {
                 float percent = calcPercent(340f, 480f, animatedValue);//内环半径增大直至消亡
                 mCurrentPercent = percent;
                 mCurrentRadius = (int) (2 * mRadius);//外环半径不再改变
-                mCurrentState = RING_DOT__HEART_VIEW;
+                mCurrentState =  State.RING_DOT__HEART_VIEW;
                 invalidate();
             } else if (animatedValue <= 1200) {
                 float percent = calcPercent(480f, 1200f, animatedValue);
                 mCurrentPercent = percent;
-                mCurrentState = DOT__HEART_VIEW;
+                mCurrentState =  State.DOT__HEART_VIEW;
                 invalidate();
                 if (animatedValue == 1200) {
                     animatorTime.cancel();
@@ -494,7 +444,7 @@ public class LikeView extends View implements Checkable {
         if (isSetChecked) {
             mCurrentColor = mCheckedColor;
             mCurrentRadius = (int) mRadius;
-            mCurrentState = HEART_VIEW;
+            mCurrentState = State.HEART_VIEW;
             invalidate();
         } else {
             restoreDefaultView();
@@ -505,7 +455,7 @@ public class LikeView extends View implements Checkable {
     private void restoreDefaultView() {
         mCurrentColor = mDefaultColor;
         mCurrentRadius = (int) mRadius;
-        mCurrentState = HEART_VIEW;
+        mCurrentState = State.HEART_VIEW;
         invalidate();
     }
 
@@ -566,4 +516,55 @@ public class LikeView extends View implements Checkable {
     public boolean isChecked() {
         return this.isChecked;
     }
+
+
+    public void setDefaultColor(int defaultColor) {
+        this.mDefaultColor = defaultColor;
+    }
+
+    public void setCheckedColor(int checkedColor) {
+        this.mCheckedColor = checkedColor;
+    }
+
+    /**
+     * set unselect animation-duration(ms)
+     */
+    public void setUnSelectCycleTime(int unSelectCycleTime) {
+        this.mUnSelectCycleTime = unSelectCycleTime;
+    }
+
+    public void setLrGroupCRatio(float lrGroupCRatio) {
+        this.mLrGroupCRatio = lrGroupCRatio;
+    }
+
+    public void setLrGroupBRatio(float lrGroupBRatio) {
+        this.mLrGroupBRatio = lrGroupBRatio;
+    }
+
+    public void setBGroupACRatio(float bGroupACRatio) {
+        this.mBGroupACRatio = bGroupACRatio;
+    }
+
+    public void setTGroupBRatio(float tGroupBRatio) {
+        this.mTGroupBRatio = tGroupBRatio;
+    }
+
+    public void setDefaultIcon(Drawable defaultIcon) {
+        this.mDefaultIcon = defaultIcon;
+    }
+
+    public void setCheckedIcon(Drawable checkedIcon) {
+        this.mCheckedIcon = checkedIcon;
+    }
+
+    public void setRadius(float radius) {
+        this.mRadius = radius;
+    }
+    /**
+     * set select animation-duration(ms)
+     */
+    public void setCycleTime(int cycleTime) {
+        this.mCycleTime = cycleTime;
+    }
+
 }

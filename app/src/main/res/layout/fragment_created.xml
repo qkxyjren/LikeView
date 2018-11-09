@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:id="@+id/ll_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical">
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="create with image icon"
+      android:textColor="@color/colorAccent"/>
+    <com.jaren.lib.view.LikeView
+      android:id="@+id/lv_icon"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      app:bGroupACRatio="0.54"
+      app:checkedLikeIconRes="@mipmap/btn_check_buttonless_on"
+      app:defaultLikeIconRes="@mipmap/btn_check_buttonless_off"
+      app:cirRadius="20dp"
+      app:cycleTime="3600"
+      app:tGroupBRatio="0.37"/>
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="create by changing Bezier controller point"
+    android:textColor="@color/colorAccent"/>
+  <com.jaren.lib.view.LikeView
+    android:id="@+id/lv_xml"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    app:bGroupACRatio="0.5"
+    app:lrGroupCRatio="0.68"
+    app:lrGroupBRatio="0.88"
+    app:checkedColor="#ffff0000"
+    app:cirRadius="12dp"
+    app:cycleTime="3600"
+    app:defaultColor="#ffcc9999"
+    app:tGroupBRatio="0.4"/>
+
+  <TextView
+    android:id="@+id/tv_builder"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="create by LikeViewBuilder"
+    android:textColor="@color/colorAccent"/>
+</LinearLayout>
+</android.support.v4.widget.NestedScrollView>
