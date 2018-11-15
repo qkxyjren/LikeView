@@ -24,10 +24,12 @@ public class TextSeekBar extends LinearLayout {
 
     public TextSeekBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        View root = LayoutInflater.from(context).inflate(R.layout.text_seekbar_item, this);
+        View root = LayoutInflater.from(context).inflate(R.layout.text_seekbar_item, this,true);
         tv = root.findViewById(R.id.tv);
         sb = root.findViewById(R.id.s_bar);
+        sb.setId((this.getId()));
     }
+
 
     public void  setSeekBarText(CharSequence s){
         tv.setText(s);
@@ -36,4 +38,6 @@ public class TextSeekBar extends LinearLayout {
     public SeekBar getSeekBar() {
         return sb;
     }
+
+
 }

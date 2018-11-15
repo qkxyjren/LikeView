@@ -31,30 +31,41 @@ public class AttributesFragment extends Fragment implements OnClickListener {
     private TextSeekBar mLrbTSeekBar;
     private TextSeekBar mTbTSeekBar;
     private TextView mTvRestore;
+    private View root;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View root=  inflater.inflate(R.layout.fragment_attributes,container,false);
-        rlParent = root.findViewById(R.id.rl_parent);
-        mLikeView = root.findViewById(R.id.lv);
-        mBacTSeekBar = root.findViewById(R.id.bac_s_bar);
-        mLrcTSeekBar = root.findViewById(R.id.lrc_s_bar);
-        mLrbTSeekBar = root.findViewById(R.id.lrb_s_bar);
-        mTbTSeekBar = root.findViewById(R.id.tb_s_bar);
-        mTvMsg = root.findViewById(R.id.tv_msg);
-        mTvRestore = root.findViewById(R.id.tv_restore);
+        if (root==null) {
+            root=  inflater.inflate(R.layout.fragment_attributes,container,false);
+            rlParent = root.findViewById(R.id.rl_parent);
+            mLikeView = root.findViewById(R.id.lv);
+            mBacTSeekBar = root.findViewById(R.id.bac_s_bar);
+            mLrcTSeekBar = root.findViewById(R.id.lrc_s_bar);
+            mLrbTSeekBar = root.findViewById(R.id.lrb_s_bar);
+            mTbTSeekBar = root.findViewById(R.id.tb_s_bar);
+            mTvMsg = root.findViewById(R.id.tv_msg);
+            mTvRestore = root.findViewById(R.id.tv_restore);
 
-        mLikeView.setOnClickListener(this);
-        mTvRestore.setOnClickListener(this);
-        initTSeekBar("bGroupACRatio", mBacTSeekBar);
-        initTSeekBar("lrGroupCRatio", mLrcTSeekBar);
-        initTSeekBar("lrGroupBRatio", mLrbTSeekBar);
-        initTSeekBar("tGroupBRatio", mTbTSeekBar);
-        initLvSetting();
-        useLikeViewBuilder();
+            mLikeView.setOnClickListener(this);
+            mTvRestore.setOnClickListener(this);
+            initTSeekBar("bGroupACRatio", mBacTSeekBar);
+            initTSeekBar("lrGroupCRatio", mLrcTSeekBar);
+            initTSeekBar("lrGroupBRatio", mLrbTSeekBar);
+            initTSeekBar("tGroupBRatio", mTbTSeekBar);
+            initLvSetting();
+        }
+
+//        useLikeViewBuilder();
+        Log.e("AttributesFragment", "onCreateView: " );
         return root;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     private void initLvSetting() {
         mBacTSeekBar.getSeekBar().setProgress(70);
         mLrcTSeekBar.getSeekBar().setProgress(92);
@@ -62,12 +73,13 @@ public class AttributesFragment extends Fragment implements OnClickListener {
         mTbTSeekBar.getSeekBar().setProgress(40);
     }
     private void initTSeekBar(final CharSequence attribute, final TextSeekBar tSeekBar) {
+        Log.e("AttributesFragment", "initTSeekBar: "+attribute );
         tSeekBar.setSeekBarText(attribute);
         tSeekBar.getSeekBar().setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 float realProgress=progress/100f;
-                Log.d( "LikeView",realProgress+"");
+                Log.d( "AttributesFragment",+ realProgress+"---"+attribute +fromUser);
                 tSeekBar.setSeekBarText("app:"+attribute+" "+realProgress);
                 if ("tGroupBRatio".equals(attribute)) {
                     mLikeView.setTGroupBRatio(realProgress);
@@ -98,7 +110,7 @@ public class AttributesFragment extends Fragment implements OnClickListener {
             .setRadius(getResources().getDimension(R.dimen.lv_radius))
             .setDefaultColor(Color.GRAY)
             .setCheckedColor(Color.RED)
-            .setCycleTime(1000)
+            .setCycleTime(4000)
             .setUnSelectCycleTime(200)
             .setTGroupBRatio(0.37f)
             .setBGroupACRatio(0.54f)

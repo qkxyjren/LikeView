@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.design_activity);
+        setContentView(R.layout.activity_main);
         mTablayout = findViewById(R.id.tablayout);
         mViewPager = findViewById(R.id.viewpager);
         initView();

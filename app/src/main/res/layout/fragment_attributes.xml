@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@+id/rl_parent"
+  android:paddingTop="10dp"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical">
@@ -20,8 +21,8 @@
     android:layout_gravity="center_horizontal"
     app:bGroupACRatio="0.7"
     app:checkedColor="#ffff6600"
-    app:cirRadius="40dp"
-    app:cycleTime="6600"
+    app:cirRadius="30dp"
+    app:cycleTime="3000"
     app:defaultColor="#ffcc99cc"
     app:tGroupBRatio="0.4"/>
 
@@ -44,6 +45,7 @@
       android:id="@+id/lrb_s_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
+
     <com.jaren.likeview.TextSeekBar
       android:id="@+id/bac_s_bar"
       android:layout_width="match_parent"

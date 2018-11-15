@@ -7,7 +7,7 @@
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="create with image icon"
+    android:text="toggle"
     android:textColor="@color/colorAccent"/>
   <com.jaren.lib.view.LikeView
     android:id="@+id/lv"
@@ -15,13 +15,13 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     app:checkedColor="#ffff0000"
-    app:cirRadius="40dp"
+    app:cirRadius="20dp"
     app:cycleTime="3600"
     app:defaultColor="#ffcc9999"/>
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="create with image icon"
+    android:text="set"
     android:textColor="@color/colorAccent"/>
   <com.jaren.lib.view.LikeView
     android:id="@+id/lv_set"
@@ -29,7 +29,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     app:checkedColor="#ffff0000"
-    app:cirRadius="40dp"
+    app:cirRadius="20dp"
     app:cycleTime="1600"
     app:unSelectCycleTime="300"
     app:defaultColor="#ffcccccc"/>

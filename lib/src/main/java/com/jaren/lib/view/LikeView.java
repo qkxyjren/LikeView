@@ -19,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Checkable;
 import com.jaren.lib.R;
+import java.util.Random;
 
 
 /**
@@ -28,14 +29,6 @@ import com.jaren.lib.R;
 
 public class LikeView extends View implements Checkable {
 
-    private  int mDefaultColor;
-    private  int mCheckedColor;
-    private  float mLrGroupCRatio;
-    private  float mLrGroupBRatio;
-    private  float mBGroupACRatio;
-    private  float mTGroupBRatio;
-    private  Drawable mDefaultIcon;
-    private  Drawable mCheckedIcon;
     /**
      * 圆最大半径（心形）
      */
@@ -49,6 +42,22 @@ public class LikeView extends View implements Checkable {
      * View取消选中用时
      */
     private  int mUnSelectCycleTime;
+    private  int mDefaultColor;
+    private  int mCheckedColor;
+    private  float mLrGroupCRatio;
+    private  float mLrGroupBRatio;
+    private  float mBGroupACRatio;
+    private  float mTGroupBRatio;
+    private  int mInnerShapeScale;
+    private  int mDotSizeScale;
+    private  Drawable mDefaultIcon;
+    private  Drawable mCheckedIcon;
+    private   int[] mDotColors;
+    private  int mRingColor;
+    private  boolean mAllowRandomDotColor;
+
+
+
 
     /**
      * 是否点赞
@@ -62,6 +71,11 @@ public class LikeView extends View implements Checkable {
      * 心形默认未选中颜色
      */
     public static final int DEFAULT_COLOR = 0Xff657487;
+    /**
+     * 圆环默认颜色
+     */
+    public static final int DEFAULT_RING_COLOR = 0Xffde7bcc;
+
 
     public static final int DEFAULT_CYCLE_TIME = 2000;
 
@@ -70,8 +84,16 @@ public class LikeView extends View implements Checkable {
     /**
      * 环绕圆点的颜色
      */
-    private static final int[] dotColors = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
+    public static final int[] DEFAULT_DOT_COLORS = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
         0xffb1eb99, 0xff67c9ad, 0xffde6bac};
+    /**
+     * 距离外环间隔  mRadius*1/RADIUS_INNER_SHAPE_SCALE
+     */
+    public static final int RADIUS_INNER_SHAPE_SCALE = 6;
+    public static final int DOT_SIZE_SCALE = 7;
+
+    private static final float RING_WIDTH_RATIO = 2f;
+    private static final float SIZE_RATIO = 5.2f;
 
 
     private float mCenterX;
@@ -80,6 +102,9 @@ public class LikeView extends View implements Checkable {
     private ValueAnimator animatorTime;
     private ValueAnimator animatorArgb;
     private AnimatorUpdateListener lvAnimatorUpdateListener;
+    /**
+     * 外部圆环半径
+     */
     private int mCurrentRadius;
     private int mCurrentColor;
     private int mCurrentState;
@@ -92,7 +117,6 @@ public class LikeView extends View implements Checkable {
     private float dotR;
     private ObjectAnimator unselectAnimator;
     private HeartShapePathController mHeartShapePathController;
-
 
     public LikeView(Context context) {
         this(context, null);
@@ -110,24 +134,30 @@ public class LikeView extends View implements Checkable {
         mUnSelectCycleTime = array.getInt(R.styleable.LikeView_unSelectCycleTime, DEFAULT_UN_SELECT_CYCLE_TIME);
         mDefaultColor = array.getColor(R.styleable.LikeView_defaultColor, DEFAULT_COLOR);
         mCheckedColor = array.getColor(R.styleable.LikeView_checkedColor, CHECKED_COLOR);
+        mRingColor = array.getColor(R.styleable.LikeView_ringColor, DEFAULT_RING_COLOR);
         mLrGroupCRatio = array.getFloat(R.styleable.LikeView_lrGroupCRatio, HeartShapePathController.LR_GROUP_C_RATIO);
         mLrGroupBRatio = array.getFloat(R.styleable.LikeView_lrGroupBRatio, HeartShapePathController.LR_GROUP_B_RATIO);
         mBGroupACRatio = array.getFloat(R.styleable.LikeView_bGroupACRatio, HeartShapePathController.B_GROUP_AC_RATIO);
         mTGroupBRatio = array.getFloat(R.styleable.LikeView_tGroupBRatio, HeartShapePathController.T_GROUP_B_RATIO);
+        mInnerShapeScale = array.getInteger(R.styleable.LikeView_innerShapeScale, RADIUS_INNER_SHAPE_SCALE);
+        mDotSizeScale = array.getInteger(R.styleable.LikeView_dotSizeScale, DOT_SIZE_SCALE);
+        mAllowRandomDotColor = array.getBoolean(R.styleable.LikeView_allowRandomDotColor, true);
+
         if (array.hasValue(R.styleable.LikeView_defaultLikeIconRes)){
             mDefaultIcon= array.getDrawable(R.styleable.LikeView_defaultLikeIconRes);
         }
         if (array.hasValue(R.styleable.LikeView_checkedLikeIconRes)){
             mCheckedIcon= array.getDrawable(R.styleable.LikeView_checkedLikeIconRes);
         }
+
         array.recycle();
         mCenterX =mRadius;
         mCenterY =mRadius;
         mPaint = new Paint();
         mCurrentRadius = (int)mRadius;
         mCurrentColor = mDefaultColor;
-        dotR = mRadius / 6;
-
+        dotR = mRadius / mDotSizeScale;
+        mDotColors =DEFAULT_DOT_COLORS;
     }
 
     @Override
@@ -188,36 +218,40 @@ public class LikeView extends View implements Checkable {
     //绘制圆环
     private void drawRing(Canvas canvas, int radius, int color, float percent) {
 
-        mPaint.setColor(color);
+        mPaint.setColor(mRingColor);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(2 * mRadius * percent);
+        mPaint.setStrokeWidth(RING_WIDTH_RATIO * mRadius * percent);
         RectF rectF = new RectF(-radius, -radius, radius, radius);
         canvas.drawArc(rectF, 0, 360, false, mPaint);
     }
 
     //绘制圆点、圆环、心形
     private void drawDotWithRing(Canvas canvas, int radius, int color) {
-        mPaint.setColor(color);
+        dotR = mRadius / mDotSizeScale;
+        mPaint.setColor(mRingColor);
         mPaint.setAntiAlias(true);
-
+        //用于计算圆环宽度，最小0，与动画进度负相关
+        float  ringPercent = (1f - mCurrentPercent > 1f ? 1f : 1f - mCurrentPercent) * 0.2f;
+        //环形宽度缩小
+        float ringWidth=RING_WIDTH_RATIO *  mRadius * ringPercent;
+        mPaint.setStrokeWidth(ringWidth);
         mPaint.setStyle(Paint.Style.STROKE);
         if (mCurrentPercent <= 1) {
             RectF rectF = new RectF(-radius, -radius, radius, radius);
             canvas.drawArc(rectF, 0, 360, false, mPaint);
         }
-        mCurrentPercent =
-            (1f - mCurrentPercent > 1f ? 1f : 1f - mCurrentPercent) * 0.2f;//用于计算圆环宽度，最小0，与动画进度负相关
-        mPaint.setStrokeWidth(2 * mRadius * mCurrentPercent);
 
-        float innerR = radius - mRadius * mCurrentPercent + dotR;
+        //圆点圆心位置
+        float innerR = radius - ringWidth/2 + dotR;
         double angleA = 0;
         double angleB = -Math.PI / 20;
-
-        offS += dotR / 17;
-        offL += dotR / 14;
-        rDotS = radius - mRadius / 12 / 2 + offS;
-        rDotL = innerR + offL;
+        if (rDotL <=SIZE_RATIO * mRadius/2) {//限制圆点的扩散范围
+            offS += dotR / 17;
+            offL += dotR / 14;
+            rDotS = radius - mRadius / 12 / 2 + offS;
+            rDotL = innerR + offL;
+        }
 
         mPaint.setStyle(Paint.Style.FILL);
         for (int i = 0; i < 7; i++) {
@@ -230,7 +264,7 @@ public class LikeView extends View implements Checkable {
                     dotR, mPaint);
             angleB += 2 * Math.PI / 7;
         }
-        mCurrentRadius = (int) (mRadius / 3 + offL * 4);
+        mCurrentRadius = (int) (mRadius / mInnerShapeScale + (mInnerShapeScale*2-2) * mRadius  * mCurrentPercent/ mInnerShapeScale);
         drawInnerShape(canvas, mCurrentRadius, true);
 
     }
@@ -244,7 +278,7 @@ public class LikeView extends View implements Checkable {
         double angleB = -Math.PI / 20;
         float dotRS;
         float dotRL;
-        if (rDotL < 2.6 * mRadius) {//限制圆点的扩散范围
+        if (rDotL <= SIZE_RATIO * mRadius/2) {//限制圆点的扩散范围
             rDotS += dotR / 17;
             rDotL += dotR / 14;
         }
@@ -262,12 +296,13 @@ public class LikeView extends View implements Checkable {
         }
         drawInnerShape(canvas, mCurrentRadius, true);
 
-        mPaint.setAlpha((int) (255 * (1 - mCurrentPercent)));//圆点逐渐透明
-        dotRS = (float) (dotR * (1 - mCurrentPercent));
-        dotRL = (float) (dotR * (1 - mCurrentPercent) * 4) > dotR ? dotR
-            : (float) (dotR * (1 - mCurrentPercent) * 3);
-        for (int i = 0; i < 7; i++) {
-            mPaint.setColor(dotColors[i]);
+        //圆点逐渐变小
+        dotRS =  (dotR * (1 - mCurrentPercent));
+        dotRL = (dotR * (1 - mCurrentPercent))*3 > dotR ? dotR :(dotR * (1 - mCurrentPercent))*2;
+        for (int i = 0; i < mDotColors.length; i++) {
+            mPaint.setColor(mDotColors[i]);
+//            //圆点逐渐透明
+//            mPaint.setAlpha((int) (255 * (1 - mCurrentPercent)));
             canvas
                 .drawCircle((float) (rDotS * Math.sin(angleA)), (float) (rDotS * Math.cos(angleA)),
                     dotRS, mPaint);
@@ -280,6 +315,17 @@ public class LikeView extends View implements Checkable {
 
     }
 
+    private final Random mDotColorsRandom=new Random();
+    private void randomDotColors() {
+        int length= mDotColors.length;
+        for (int i = 0; i <length; i++) {
+            int random=  mDotColorsRandom.nextInt(length);
+            int currentColor= mDotColors[i];
+            mDotColors[i]= mDotColors[random];
+            mDotColors[random]=currentColor;
+        }
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -290,8 +336,8 @@ public class LikeView extends View implements Checkable {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int mWidth, mHeight;
-        mWidth = (int) (5.2 * mRadius + 2 * dotR);
-        mHeight = (int) (5.2 * mRadius + 2 * dotR);
+        mWidth = (int) (SIZE_RATIO * mRadius + 2 * dotR);
+        mHeight = (int) (SIZE_RATIO * mRadius + 2 * dotR);
         setMeasuredDimension(mWidth, mHeight);
 
     }
@@ -301,6 +347,9 @@ public class LikeView extends View implements Checkable {
      */
     private void startSelectViewMotion() {
         resetState();
+        if (mAllowRandomDotColor) {
+            randomDotColors();
+        }
         if (animatorTime == null) {
             animatorTime = ValueAnimator.ofInt(0, 1200);
             animatorTime.setDuration(mCycleTime);
@@ -330,7 +379,7 @@ public class LikeView extends View implements Checkable {
             int animatedValue = (int) animation.getAnimatedValue();
             if (animatedValue == 0) {
                 if (animatorArgb == null || !animatorArgb.isRunning()) {
-                    animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, 0Xffde7bcc);
+                    animatorArgb = ofArgb(mDefaultColor, 0Xfff74769, mCheckedColor);
                     animatorArgb.setDuration(mCycleTime * 28 / 120);
                     animatorArgb.setInterpolator(new LinearInterpolator());
                     animatorArgb.start();
@@ -480,7 +529,7 @@ public class LikeView extends View implements Checkable {
     private void releaseAnimator(Animator animator ) {
         if (animator != null) {
             animator.removeAllListeners();
-            animator.cancel();
+            animator.end();
         }
     }
 
@@ -517,54 +566,118 @@ public class LikeView extends View implements Checkable {
         return this.isChecked;
     }
 
-
+    /**
+     * Sets the default color for the heart shape.
+     * if using icon instead of  heart shape, sets the default-icon main color is recommend.
+     */
     public void setDefaultColor(int defaultColor) {
         this.mDefaultColor = defaultColor;
     }
-
+    /**
+     * Sets the checked color for the heart shape.<br>
+     * if using icon instead of  heart shape, sets the checked-icon main color is recommend.
+     */
     public void setCheckedColor(int checkedColor) {
         this.mCheckedColor = checkedColor;
     }
 
     /**
-     * set unselect animation-duration(ms)
+     * Sets unselect animation-duration(ms)
      */
     public void setUnSelectCycleTime(int unSelectCycleTime) {
         this.mUnSelectCycleTime = unSelectCycleTime;
     }
-
+    /**
+     * Sets controller point ratio to change left and right of the bottom part of heart shape view.
+     * @param lrGroupCRatio between 0 and 1.0 inclusive
+     */
     public void setLrGroupCRatio(float lrGroupCRatio) {
         this.mLrGroupCRatio = lrGroupCRatio;
     }
-
+    /**
+     * Sets controller point ratio to change left and right of the center of heart shape view.
+     * @param lrGroupBRatio between 0 and 1.0 inclusive
+     */
     public void setLrGroupBRatio(float lrGroupBRatio) {
         this.mLrGroupBRatio = lrGroupBRatio;
     }
-
+    /**
+     * Sets controller point ratio to change the bottom of heart shape view.
+     * @param bGroupACRatio between 0 and 1.0 inclusive
+     */
     public void setBGroupACRatio(float bGroupACRatio) {
         this.mBGroupACRatio = bGroupACRatio;
     }
-
+    /**
+     * Sets controller point ratio to change the top of heart shape view.
+     * @param tGroupBRatio between 0 and 1.0 inclusive
+     */
     public void setTGroupBRatio(float tGroupBRatio) {
         this.mTGroupBRatio = tGroupBRatio;
     }
-
+    /**
+     * Sets the default icon,using icon instead of heart shape.
+     */
     public void setDefaultIcon(Drawable defaultIcon) {
         this.mDefaultIcon = defaultIcon;
     }
 
+    /**
+     *Sets the checked icon,using icon instead of heart shape.
+     */
     public void setCheckedIcon(Drawable checkedIcon) {
         this.mCheckedIcon = checkedIcon;
     }
-
+    /**
+     *Sets the radius size which can determine the LikeView size
+     */
     public void setRadius(float radius) {
         this.mRadius = radius;
     }
     /**
-     * set select animation-duration(ms)
+     * Sets select animation-duration(ms)
      */
     public void setCycleTime(int cycleTime) {
         this.mCycleTime = cycleTime;
     }
 
+    /**
+     *  Sets the inner shape size , there is  positive correlation between  inner shape size and innerShapeScale
+     *
+     * @param innerShapeScale  value range in [2,10] is suggested ,default  {@link #RADIUS_INNER_SHAPE_SCALE}
+     */
+    public void setInnerShapeScale(int innerShapeScale) {
+        this.mInnerShapeScale = innerShapeScale;
+    }
+
+    /**
+     * Sets the dot size , there is  negative correlation between dot size and dotSizeScale
+     *
+     * @param dotSizeScale value range in [7,14] is suggested  ,default {@link #DOT_SIZE_SCALE}
+     */
+    public void setDotSizeScale(int dotSizeScale) {
+        this.mDotSizeScale = dotSizeScale;
+    }
+
+    /**
+     * Sets the dots color .
+     */
+    public void setDotColors(int[] dotColors) {
+        if (dotColors.length!=DEFAULT_DOT_COLORS.length){
+            throw  new IllegalArgumentException("length of dotColors should be "+DEFAULT_DOT_COLORS.length);
+        }
+        this.mDotColors = dotColors;
+    }
+    /**
+     * Sets the ring color.
+     */
+    public void setRingColor(int ringColor) {
+        this.mRingColor = ringColor;
+    }
+    /**
+     * Sets whether random dot color is allowed,default is true.
+     */
+    public void setAllowRandomDotColor(boolean allowRandomDotColor) {
+        this.mAllowRandomDotColor = allowRandomDotColor;
+    }
 }

@@ -20,16 +20,17 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center_horizontal"
-      app:bGroupACRatio="0.54"
-      app:checkedLikeIconRes="@mipmap/btn_check_buttonless_on"
-      app:defaultLikeIconRes="@mipmap/btn_check_buttonless_off"
-      app:cirRadius="20dp"
-      app:cycleTime="3600"
-      app:tGroupBRatio="0.37"/>
+      app:ringColor="#ff44ff00"
+      app:checkedColor="#ff44ff00"
+      app:defaultColor="#ffcccccc"
+      app:checkedLikeIconRes="@mipmap/btn_checked"
+      app:defaultLikeIconRes="@mipmap/btn_check_default"
+      app:cirRadius="14dp"
+      app:cycleTime="2000"/>
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="create by changing Bezier controller point"
+    android:text="created by changing Bezier controller point"
     android:textColor="@color/colorAccent"/>
   <com.jaren.lib.view.LikeView
     android:id="@+id/lv_xml"
@@ -40,7 +41,8 @@
     app:lrGroupCRatio="0.68"
     app:lrGroupBRatio="0.88"
     app:checkedColor="#ffff0000"
-    app:cirRadius="12dp"
+    app:ringColor="#ff77ff00"
+    app:cirRadius="8dp"
     app:cycleTime="3600"
     app:defaultColor="#ffcc9999"
     app:tGroupBRatio="0.4"/>
@@ -49,7 +51,7 @@
     android:id="@+id/tv_builder"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="create by LikeViewBuilder"
+    android:text="created by LikeViewBuilder"
     android:textColor="@color/colorAccent"/>
 </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
