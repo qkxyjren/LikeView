@@ -34,6 +34,6 @@ dependencies {
     compile 'com.android.support:design:27.1.1'
 
     testCompile 'junit:junit:4.12'
-//    compile 'com.jaren:likeview:1.1.0'
+//    compile 'com.jaren:likeview:1.2.0'
     compile project(path: ':lib')
 }

@@ -3,7 +3,7 @@
 
 [![platform](https://img.shields.io/badge/platform-Android-yellow.svg)](https://www.android.com)
 [![API](https://img.shields.io/badge/API-14%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=14)
-
+[![Download](https://api.bintray.com/packages/qkxyjren/maven/likeview/images/download.svg) ](https://bintray.com/qkxyjren/maven/likeview/_latestVersion)
 ![preview 1.2.0](images/screenshot120.gif)
 ![preview 1.0.0](images/screenshot.gif)
 
@@ -90,6 +90,7 @@ add the dependency to the the  build.gradle file
 ## LikeView has the following xml attributes
 
 You can customize the look and behavior of the `LikeView` in xml. Use the following attributes in xml.
+
 | attribute | description |
 | --------------- | --------------------- |
 |defaultColor|the default color for the heart shape|
