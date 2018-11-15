@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 110
-        versionName "1.1.0"
+        versionCode 120
+        versionName "1.2.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -42,7 +42,7 @@ publish {
     userOrg = 'qkxyjren'
     groupId = 'com.jaren'
     artifactId = 'likeview'
-    publishVersion = '1.1.0'
+    publishVersion = '1.2.0'
     desc = 'brilliant LikeView'
     website = 'https://github.com/qkxyjren/LikeView'
 }
