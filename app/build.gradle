@@ -23,6 +23,15 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            output->
+            if (variant.buildType.name.equals("release")) {
+                variant.getPackageApplication().outputDirectory = new File(project.rootDir.absolutePath + File.separator + "resource")
+                outputFileName = "likeview_${variant.buildType.name}.apk"
+            }
+        }
+    }
 }
 
 dependencies {
