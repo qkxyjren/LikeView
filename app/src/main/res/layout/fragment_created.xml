@@ -27,6 +27,20 @@
       app:defaultLikeIconRes="@mipmap/btn_check_default"
       app:cirRadius="14dp"
       app:cycleTime="2000"/>
+    <com.jaren.lib.view.LikeView
+      android:id="@+id/lv_icon_big"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:visibility="gone"
+      app:ringColor="#ff44ff00"
+      app:checkedColor="#ff44ff00"
+      app:defaultColor="#ffcccccc"
+      app:checkedLikeIconRes="@mipmap/bg_wheat"
+      app:defaultLikeIconRes="@mipmap/bg_yellow"
+      app:cirRadius="24dp"
+      app:innerShapeScale="2"
+      app:cycleTime="4000"/>
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

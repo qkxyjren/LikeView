@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,9 @@ import com.jaren.lib.view.LikeViewBuilder;
 public class CreatedFragment extends Fragment implements OnClickListener {
     public static final int[] DOT_COLORS = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
         0xffb1eb99, 0xff67c9ad, 0xff000000};
+    private static final String TAG_CF =CreatedFragment.class.getSimpleName();
     private LikeView mLikeViewIcon;
+    private LikeView mLikeViewIconBig;
     private LikeView mLikeViewXml;
     private View mTvBuilder;
     private ViewGroup mLLParent;
@@ -34,11 +37,15 @@ public class CreatedFragment extends Fragment implements OnClickListener {
         mLikeViewXml = root.findViewById(R.id.lv_xml);
         mLikeViewXml = root.findViewById(R.id.lv_xml);
         mLikeViewIcon = root.findViewById(R.id.lv_icon);
+        mLikeViewIconBig = root.findViewById(R.id.lv_icon_big);
         mTvBuilder = root.findViewById(R.id.tv_builder);
         mLikeViewXml.setOnClickListener(this);
         mLikeViewIcon.setOnClickListener(this);
+        mLikeViewIconBig.setOnClickListener(this);
         mTvBuilder.setOnClickListener(this);
         useLikeViewBuilder();
+        mLikeViewIcon.setCheckedWithoutAnimator(true);
+        Log.i(TAG_CF, "mLikeViewIcon isChecked: "+mLikeViewIcon.isChecked());
         return root;
     }
 
@@ -60,6 +67,7 @@ public class CreatedFragment extends Fragment implements OnClickListener {
         LinearLayout.LayoutParams layoutParams=new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity= Gravity.CENTER_HORIZONTAL;
         mLLParent.addView(likeView,layoutParams);
+        likeView.setCheckedWithoutAnimator(true);
         likeView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,10 +79,14 @@ public class CreatedFragment extends Fragment implements OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.lv_xml:
-               mLikeViewXml.toggle();
+                mLikeViewXml.toggle();
                 break;
             case R.id.lv_icon:
                 mLikeViewIcon.toggle();
+                Log.i(TAG_CF, "mLikeViewIcon isChecked: "+mLikeViewIcon.isChecked());
+                break;
+            case R.id.lv_icon_big:
+                mLikeViewIconBig.toggle();
                 break;
             case R.id.tv_builder:
                 useLikeViewBuilder();

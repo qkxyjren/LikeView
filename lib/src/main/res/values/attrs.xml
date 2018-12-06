@@ -1,38 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-  <attr format="color" name="defaultColor"></attr>
-  <attr format="color" name="checkedColor"></attr>
-  <attr format="color" name="ringColor"></attr>
-  <attr format="dimension" name="cirRadius"></attr>
-  <attr format="integer" name="cycleTime"></attr>
-  <attr format="integer" name="unSelectCycleTime"></attr>
-  <attr format="reference" name="defaultLikeIconRes"></attr>
-  <attr format="reference" name="checkedLikeIconRes"></attr>
-  <attr format="float" name="lrGroupCRatio"></attr>
-  <attr format="float" name="lrGroupBRatio"></attr>
-  <attr format="float" name="bGroupACRatio"></attr>
-  <attr format="float" name="tGroupBRatio"></attr>
-  <attr format="integer" name="innerShapeScale"></attr>
-  <attr format="integer" name="dotSizeScale"></attr>
-  <attr format="boolean" name="allowRandomDotColor"></attr>
-
   <declare-styleable name="LikeView">
-    <attr name="defaultColor"/>
-    <attr name="checkedColor"/>
-    <attr name="ringColor"/>
-    <attr name="cirRadius"/>
-    <attr name="cycleTime"/>
-    <attr name="unSelectCycleTime"/>
-    <attr name="defaultLikeIconRes"/>
-    <attr name="checkedLikeIconRes"/>
-    <attr name="lrGroupCRatio"/>
-    <attr name="lrGroupBRatio"/>
-    <attr name="bGroupACRatio"/>
-    <attr name="tGroupBRatio"/>
-    <attr name="innerShapeScale"/>
-    <attr name="dotSizeScale"/>
-    <attr name="allowRandomDotColor"/>
+    <attr format="color" name="defaultColor"></attr>
+    <attr format="color" name="checkedColor"></attr>
+    <attr format="color" name="ringColor"></attr>
+    <attr format="dimension" name="cirRadius"></attr>
+    <attr format="integer" name="cycleTime"></attr>
+    <attr format="integer" name="unSelectCycleTime"></attr>
+    <attr format="reference" name="defaultLikeIconRes"></attr>
+    <attr format="reference" name="checkedLikeIconRes"></attr>
+    <attr format="float" name="lrGroupCRatio"></attr>
+    <attr format="float" name="lrGroupBRatio"></attr>
+    <attr format="float" name="bGroupACRatio"></attr>
+    <attr format="float" name="tGroupBRatio"></attr>
+    <attr format="integer" name="innerShapeScale"></attr>
+    <attr format="integer" name="dotSizeScale"></attr>
+    <attr format="boolean" name="allowRandomDotColor"></attr>
   </declare-styleable>
 
 

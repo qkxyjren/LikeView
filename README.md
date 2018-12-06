@@ -107,7 +107,7 @@ You can customize the look and behavior of the `LikeView` in xml. Use the follow
 |bGroupACRatio|sets controller point ratio to change the bottom of heart shape view|
 |tGroupBRatio|sets controller point ratio to change the top of heart shape view|
 |innerShapeScale|the inner shape size , there is  positive correlation between  inner shape size and `innerShapeScale`.value range in [2,10] is suggested.|
-|dotSizeScale|he dot size , there is  negative correlation between dot size and `dotSizeScale`.value range in [7,14] is suggested. |
+|dotSizeScale|the dot size , there is  negative correlation between dot size and `dotSizeScale`.value range in [7,14] is suggested. |
 |allowRandomDotColor|whether random dot color is allowed,default is true|
 
 

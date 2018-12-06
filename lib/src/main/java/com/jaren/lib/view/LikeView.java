@@ -1,6 +1,5 @@
 package com.jaren.lib.view;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -60,7 +59,7 @@ public class LikeView extends View implements Checkable {
 
 
     /**
-     * 是否点赞
+     * 是否已点赞
      */
     private boolean isChecked;
     /**
@@ -166,7 +165,7 @@ public class LikeView extends View implements Checkable {
         canvas.translate(mCenterX, mCenterY);//使坐标原点在canvas中心位置
         switch (mCurrentState) {
             case State.HEART_VIEW:
-                drawInnerShape(canvas, mCurrentRadius, false);
+                drawInnerShape(canvas, mCurrentRadius, isChecked);
                 break;
             case State.CIRCLE_VIEW:
                 drawCircle(canvas, mCurrentRadius, mCurrentColor);
@@ -526,9 +525,10 @@ public class LikeView extends View implements Checkable {
         releaseAnimator(unselectAnimator);
     }
 
-    private void releaseAnimator(Animator animator ) {
+    private void releaseAnimator(ValueAnimator animator ) {
         if (animator != null) {
             animator.removeAllListeners();
+            animator.removeAllUpdateListeners();
             animator.end();
         }
     }
