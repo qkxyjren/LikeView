@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+
 
 android {
     compileSdkVersion 26
@@ -7,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 121
-        versionName "1.2.1"
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -25,7 +28,14 @@ android {
         }
     }
 }
-
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.9'
+    }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -36,15 +46,35 @@ dependencies {
 }
 
 
-apply plugin: 'com.novoda.bintray-release'
 
 publish {
     userOrg = 'qkxyjren'
     groupId = 'com.jaren'
     artifactId = 'likeview'
-    publishVersion = '1.2.1'
+    publishVersion = rootProject.ext.versionName
     desc = 'brilliant LikeView'
     website = 'https://github.com/qkxyjren/LikeView'
 }
 
-
+//
+//ext {
+//    bintrayRepo = 'maven'
+//    bintrayName = 'likeview'
+//    publishedGroupId = 'com.jaren'
+//    artifact = 'likeview'
+//    libraryVersion =rootProject.ext.versionName
+//    libraryDescription = 'brilliant LikeView '
+//    libraryName = 'likeview'
+//    siteUrl = 'https://github.com/qkxyjren/LikeView'
+//    gitUrl = 'https://github.com/qkxyjren/LikeView.git'
+//
+//    developerId = 'jaren'
+//    developerName = 'jaren'
+//    developerEmail = 'qkxywwbs@163.com'
+//
+//    licenseName = 'The Apache Software License, Version 2.0'
+//    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//    allLicenses = ["Apache-2.0"]
+//}
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

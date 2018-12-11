@@ -15,7 +15,7 @@
 add the dependency to the the  build.gradle file
 
 ```gradle
-    compile 'com.jaren:likeview:1.2.0'
+    compile 'com.jaren:likeview:1.2.1'
 ```
 ### 2、Create likeview :
 
@@ -119,6 +119,8 @@ You can customize the look and behavior of the `LikeView` in xml. Use the follow
 [Examples](https://github.com/qkxyjren/LikeView/tree/master/app/src/main/java/com/jaren/likeview)
 
 ## Change log
+### 1.2.1
+- fix icon state
 
 ### 1.2.0
 - add attribute to adjust the heart shape view
