@@ -3,7 +3,7 @@
 
 [![platform](https://img.shields.io/badge/platform-Android-yellow.svg)](https://www.android.com)
 [![API](https://img.shields.io/badge/API-14%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=14)
-[![Download](https://api.bintray.com/packages/qkxyjren/maven/likeview/images/download.svg) ](https://bintray.com/qkxyjren/maven/likeview/_latestVersion)    
+[![Download](https://api.bintray.com/packages/qkxyjren/maven/likeview/images/download.svg) ](https://bintray.com/qkxyjren/maven/likeview/_latestVersion)
 
 ![preview 1.2.0](resource/screenshot120.gif)
 ![preview 1.0.0](resource/screenshot.gif)
@@ -15,7 +15,7 @@
 add the dependency to the the  build.gradle file
 
 ```gradle
-    compile 'com.jaren:likeview:1.2.1'
+    compile 'com.jaren:likeview:1.2.2'
 ```
 ### 2、Create likeview :
 
@@ -119,6 +119,9 @@ You can customize the look and behavior of the `LikeView` in xml. Use the follow
 [Examples](https://github.com/qkxyjren/LikeView/tree/master/app/src/main/java/com/jaren/likeview)
 
 ## Change log
+### 1.2.2
+- fix state `onDetachedFromWindow`
+
 ### 1.2.1
 - fix icon state
 

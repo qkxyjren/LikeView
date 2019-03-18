@@ -2,8 +2,11 @@ package com.jaren.likeview;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import com.jaren.lib.view.LikeView;
 import com.jaren.lib.view.LikeViewBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @date: 2018/11/6
@@ -28,6 +34,7 @@ public class CreatedFragment extends Fragment implements OnClickListener {
     private LikeView mLikeViewXml;
     private View mTvBuilder;
     private ViewGroup mLLParent;
+    private RecyclerView mRecyclerView;
 
     @Nullable
     @Override
@@ -39,6 +46,7 @@ public class CreatedFragment extends Fragment implements OnClickListener {
         mLikeViewIcon = root.findViewById(R.id.lv_icon);
         mLikeViewIconBig = root.findViewById(R.id.lv_icon_big);
         mTvBuilder = root.findViewById(R.id.tv_builder);
+        mRecyclerView = root.findViewById(R.id.recyclerview);
         mLikeViewXml.setOnClickListener(this);
         mLikeViewIcon.setOnClickListener(this);
         mLikeViewIconBig.setOnClickListener(this);
@@ -46,8 +54,11 @@ public class CreatedFragment extends Fragment implements OnClickListener {
         useLikeViewBuilder();
         mLikeViewIcon.setCheckedWithoutAnimator(true);
         Log.i(TAG_CF, "mLikeViewIcon isChecked: "+mLikeViewIcon.isChecked());
+//        initList();
         return root;
     }
+
+
 
     private void useLikeViewBuilder() {
         final LikeView likeView=new LikeViewBuilder(getContext())
@@ -95,7 +106,54 @@ public class CreatedFragment extends Fragment implements OnClickListener {
 
     }
 
+    private void initList() {
+        List<Integer> list=new ArrayList<>();
+        for (int i = 0; i < 120; i++) {
+            list.add(i);
+        }
+        mRecyclerView.setAdapter(new LvAdapter(list));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
 
 
+    private class LvAdapter extends RecyclerView.Adapter<LvAdapter.LvHolder> {
+        private final List<Integer> list;
 
+        public LvAdapter(List<Integer> list) {
+            this.list=list;
+        }
+
+        @NonNull
+        @Override
+        public LvHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            View view  =LayoutInflater.from(getContext()).inflate(R.layout.item_lv,viewGroup,false);
+            return new LvHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull final LvHolder lvHolder, int i) {
+            lvHolder.lv.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    lvHolder.lv.toggle();
+                }
+            });
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class LvHolder extends RecyclerView.ViewHolder {
+
+            private  LikeView lv;
+
+            public LvHolder(View itemView) {
+                super(itemView);
+                lv = itemView.findViewById(R.id.lv);
+            }
+        }
+    }
 }

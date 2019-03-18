@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -425,6 +426,8 @@ public class LikeView extends View implements Checkable {
                     animatorTime.cancel();
                     if (!isChecked) {
                         restoreDefaultView();
+                    }else {
+                        restoreDefaultViewChecked();
                     }
                 }
             }
@@ -490,14 +493,18 @@ public class LikeView extends View implements Checkable {
         isChecked=isSetChecked;
         cancelAnimator();
         if (isSetChecked) {
-            mCurrentColor = mCheckedColor;
-            mCurrentRadius = (int) mRadius;
-            mCurrentState = State.HEART_VIEW;
-            invalidate();
+            restoreDefaultViewChecked();
         } else {
             restoreDefaultView();
         }
 
+    }
+
+    private void restoreDefaultViewChecked() {
+        mCurrentColor = mCheckedColor;
+        mCurrentRadius = (int) mRadius;
+        mCurrentState = State.HEART_VIEW;
+        invalidate();
     }
 
     private void restoreDefaultView() {
@@ -519,17 +526,19 @@ public class LikeView extends View implements Checkable {
 
     @Override
     protected void onDetachedFromWindow() {
+//        Log.i("onDetachedFromWindow","onDetachedFromWindow");
         super.onDetachedFromWindow();
         releaseAnimator(animatorTime);
         releaseAnimator(animatorArgb);
         releaseAnimator(unselectAnimator);
+        lvAnimatorUpdateListener=null;
     }
 
     private void releaseAnimator(ValueAnimator animator ) {
         if (animator != null) {
+            animator.end();
             animator.removeAllListeners();
             animator.removeAllUpdateListeners();
-            animator.end();
         }
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="wrap_content">
+
+    <com.jaren.lib.view.LikeView
+        android:id="@+id/lv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:bGroupACRatio="0.5"
+        app:lrGroupCRatio="0.68"
+        app:lrGroupBRatio="0.88"
+        app:checkedColor="#ffff0000"
+        app:ringColor="#ff77ff00"
+        app:cirRadius="8dp"
+        app:cycleTime="3600"
+        app:defaultColor="#ffcc99cc"
+        app:tGroupBRatio="0.4"/>
+</LinearLayout>

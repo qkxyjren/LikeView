@@ -67,5 +67,11 @@
     android:layout_height="wrap_content"
     android:text="created by LikeViewBuilder"
     android:textColor="@color/colorAccent"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="300dp">
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

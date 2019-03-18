@@ -43,6 +43,6 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
 
     testImplementation 'junit:junit:4.12'
-//    implementation 'com.jaren:likeview:1.2.1'
-    implementation project(path: ':lib')
+    implementation 'com.jaren:likeview:1.2.2'
+//    implementation project(path: ':lib')
 }
