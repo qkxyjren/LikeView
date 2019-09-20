@@ -3,8 +3,6 @@ package com.jaren.likeview;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import com.jaren.lib.view.LikeView;
 import com.jaren.lib.view.LikeViewBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +22,7 @@ import java.util.List;
  * @date: 2018/11/6
  * @author: LiRJ
  */
-public class CreatedFragment extends Fragment implements OnClickListener {
+public class CreatedFragment extends BaseFragment implements OnClickListener {
     public static final int[] DOT_COLORS = {0xffdaa9fa, 0xfff2bf4b, 0xffe3bca6, 0xff329aed,
         0xffb1eb99, 0xff67c9ad, 0xff000000};
     private static final String TAG_CF =CreatedFragment.class.getSimpleName();
@@ -36,17 +33,16 @@ public class CreatedFragment extends Fragment implements OnClickListener {
     private ViewGroup mLLParent;
     private RecyclerView mRecyclerView;
 
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View  root= (ViewGroup) inflater.inflate(R.layout.fragment_created,container,false);
-        mLLParent = root.findViewById(R.id.ll_parent);
-        mLikeViewXml = root.findViewById(R.id.lv_xml);
-        mLikeViewXml = root.findViewById(R.id.lv_xml);
-        mLikeViewIcon = root.findViewById(R.id.lv_icon);
-        mLikeViewIconBig = root.findViewById(R.id.lv_icon_big);
-        mTvBuilder = root.findViewById(R.id.tv_builder);
-        mRecyclerView = root.findViewById(R.id.recyclerview);
+    protected void initEvent(Bundle savedInstanceState) {
+        mLLParent = mRootView.findViewById(R.id.ll_parent);
+        mLikeViewXml = mRootView.findViewById(R.id.lv_xml);
+        mLikeViewXml = mRootView.findViewById(R.id.lv_xml);
+        mLikeViewIcon = mRootView.findViewById(R.id.lv_icon);
+        mLikeViewIconBig = mRootView.findViewById(R.id.lv_icon_big);
+        mTvBuilder = mRootView.findViewById(R.id.tv_builder);
+        mRecyclerView = mRootView.findViewById(R.id.recyclerview);
         mLikeViewXml.setOnClickListener(this);
         mLikeViewIcon.setOnClickListener(this);
         mLikeViewIconBig.setOnClickListener(this);
@@ -55,9 +51,12 @@ public class CreatedFragment extends Fragment implements OnClickListener {
         mLikeViewIcon.setCheckedWithoutAnimator(true);
         Log.i(TAG_CF, "mLikeViewIcon isChecked: "+mLikeViewIcon.isChecked());
 //        initList();
-        return root;
     }
 
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_created;
+    }
 
 
     private void useLikeViewBuilder() {

@@ -1,12 +1,8 @@
 package com.jaren.likeview;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Toast;
 import com.jaren.lib.view.LikeView;
 import java.util.Random;
@@ -15,20 +11,24 @@ import java.util.Random;
  * @date: 2018/11/6
  * @author: LiRJ
  */
-public class NetRequestFragment extends Fragment implements OnClickListener {
+public class NetRequestFragment extends BaseFragment implements OnClickListener {
 
     private LikeView mLikeView;
     private LikeView mLikeViewSet;
 
-    @Nullable
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View root=  inflater.inflate(R.layout.fragment_net_request,container,false);
-        mLikeView = root.findViewById(R.id.lv);
-        mLikeViewSet = root.findViewById(R.id.lv_set);
+    protected void initEvent(Bundle savedInstanceState) {
+        mLikeView = mRootView.findViewById(R.id.lv);
+        mLikeViewSet = mRootView.findViewById(R.id.lv_set);
         mLikeView.setOnClickListener(this);
         mLikeViewSet.setOnClickListener(this);
-        return root;
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_net_request;
     }
 
 

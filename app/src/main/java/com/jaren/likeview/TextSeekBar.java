@@ -1,6 +1,7 @@
 package com.jaren.likeview;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -24,19 +25,28 @@ public class TextSeekBar extends LinearLayout {
 
     public TextSeekBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        View root = LayoutInflater.from(context).inflate(R.layout.text_seekbar_item, this,true);
+        View root = LayoutInflater.from(context).inflate(R.layout.text_seekbar_item, this, true);
         tv = root.findViewById(R.id.tv);
         sb = root.findViewById(R.id.s_bar);
         sb.setId((this.getId()));
     }
 
 
-    public void  setSeekBarText(CharSequence s){
+    public void setSeekBarText(CharSequence s) {
         tv.setText(s);
     }
 
     public SeekBar getSeekBar() {
         return sb;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        try {
+            super.onRestoreInstanceState(state);
+        } catch (Exception e) {
+        }
+        state = null;
     }
 
 

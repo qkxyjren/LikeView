@@ -2,13 +2,9 @@ package com.jaren.likeview;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -21,7 +17,7 @@ import com.jaren.lib.view.LikeViewBuilder;
  * @date: 2018/11/6
  * @author: LiRJ
  */
-public class AttributesFragment extends Fragment implements OnClickListener {
+public class AttributesFragment extends BaseFragment implements OnClickListener {
 
     private LikeView mLikeView;
     private TextView mTvMsg;
@@ -31,34 +27,35 @@ public class AttributesFragment extends Fragment implements OnClickListener {
     private TextSeekBar mLrbTSeekBar;
     private TextSeekBar mTbTSeekBar;
     private TextView mTvRestore;
-    private View root;
 
-    @Nullable
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if (root==null) {
-            root=  inflater.inflate(R.layout.fragment_attributes,container,false);
-            rlParent = root.findViewById(R.id.rl_parent);
-            mLikeView = root.findViewById(R.id.lv);
-            mBacTSeekBar = root.findViewById(R.id.bac_s_bar);
-            mLrcTSeekBar = root.findViewById(R.id.lrc_s_bar);
-            mLrbTSeekBar = root.findViewById(R.id.lrb_s_bar);
-            mTbTSeekBar = root.findViewById(R.id.tb_s_bar);
-            mTvMsg = root.findViewById(R.id.tv_msg);
-            mTvRestore = root.findViewById(R.id.tv_restore);
+    protected void initEvent(Bundle savedInstanceState) {
+        rlParent = mRootView.findViewById(R.id.rl_parent);
+        mLikeView = mRootView.findViewById(R.id.lv);
+        mBacTSeekBar = mRootView.findViewById(R.id.bac_s_bar);
+        mLrcTSeekBar = mRootView.findViewById(R.id.lrc_s_bar);
+        mLrbTSeekBar = mRootView.findViewById(R.id.lrb_s_bar);
+        mTbTSeekBar = mRootView.findViewById(R.id.tb_s_bar);
+        mTvMsg = mRootView.findViewById(R.id.tv_msg);
+        mTvRestore = mRootView.findViewById(R.id.tv_restore);
 
-            mLikeView.setOnClickListener(this);
-            mTvRestore.setOnClickListener(this);
-            initTSeekBar("bGroupACRatio", mBacTSeekBar);
-            initTSeekBar("lrGroupCRatio", mLrcTSeekBar);
-            initTSeekBar("lrGroupBRatio", mLrbTSeekBar);
-            initTSeekBar("tGroupBRatio", mTbTSeekBar);
-            initLvSetting();
-        }
+        mLikeView.setOnClickListener(this);
+        mTvRestore.setOnClickListener(this);
+        initTSeekBar("bGroupACRatio", mBacTSeekBar);
+        initTSeekBar("lrGroupCRatio", mLrcTSeekBar);
+        initTSeekBar("lrGroupBRatio", mLrbTSeekBar);
+        initTSeekBar("tGroupBRatio", mTbTSeekBar);
+        initLvSetting();
 
-//        useLikeViewBuilder();
-        Log.e("AttributesFragment", "onCreateView: " );
-        return root;
+        //useLikeViewBuilder();
+        Log.e("AttributesFragment", "initEvent: " );
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_attributes;
     }
 
     @Override
